@@ -5,8 +5,8 @@ This document is the portfolio control layer: it defines what we build, what we 
 
 ## Document Meta
 
-- Version: `3.45`
-- Last updated: `2026-07-20`
+- Version: `3.46`
+- Last updated: `2026-08-19`
 - Owner: `@teo-garcia`
 
 ## Leadership Intent
@@ -121,7 +121,7 @@ Each lane keeps an internal family resemblance (scripts, docs shape, testing bas
 - GOV-108: main-branch governance is not mechanically enforced across the portfolio. Only `next-template-fullstack` and `react-router-template-fullstack` have branch protection, and those rules do not require pull requests, reviews, or status checks and still allow force pushes. Existing rulesets in seven other repos are disabled.
 - GOV-109: security workflows do not consistently match the documented security baseline. High-severity dependency audits are non-blocking in multiple Node.js repos, most workflows omit explicit least-privilege permissions, action references use mutable tags, and secret scanning is not consistently enabled.
 - GOV-110: lifecycle state is not synchronized with GitHub. Repositories classified as archived remain active remotely and continue to receive Renovate pull requests, while several active starters are not marked as GitHub template repositories.
-- GOV-111: active-repo completeness is inconsistent. `fastapi-template-microservice` has no CI, security, or Docker-build workflows; `microservices-template-stack` has no standalone repository, CI, or license; and `astro-template-fullstack` is missing the required `.dockerignore`.
+- GOV-111: active-repo completeness is inconsistent. `fastapi-template-microservice` has no CI, security, or Docker-build workflows; `microservices-template-stack` has no CI; and `astro-template-fullstack` is missing the required `.dockerignore`.
 
 ## Portfolio Map
 
@@ -170,7 +170,9 @@ Each lane keeps an internal family resemblance (scripts, docs shape, testing bas
 
 ## Current Open Work Snapshot
 
-Verified against local repo state and public GitHub settings on `2026-07-20`.
+The portfolio repository and submodule structure were verified locally and
+against public GitHub remotes on `2026-08-19`. The broader GitHub settings
+snapshot remains from `2026-07-20`.
 
 - Open board totals: `31 Todo`, `1 In Progress`, `3 Blocked`, `2 Incubating`.
 - Completed governance items are intentionally not listed on the board. Their decisions live in the fundamentals, lane standards, runtime defaults, and change-control rules below.
@@ -747,11 +749,11 @@ Legend: Priority `P0` critical · `P1` high · `P2` medium · `P3` low — Statu
 | GOV-099 | P1  | Todo   | Expansion   | `django-template-microservice`, `adonis-template-microservice` | Django and AdonisJS microservice pairs are not yet represented as scaffold work.                                | Define and scaffold Django and AdonisJS microservice templates under the microservice baseline. |
 | GOV-101 | P2  | Todo   | Documentation | `adonis-template-monolith`              | `adonis-template-monolith` package metadata and badge indicate AdonisJS 7, but the README feature table says AdonisJS 6. | Align README framework version and any related AdonisJS wording with the verified package metadata and governance framework matrix. |
 | GOV-106 | P2  | Todo   | Frontend DX | Angular web templates                    | Angular public env prefixes and promotion rules are not documented.                                            | Document `NG_APP_*` (or chosen prefix), API URL strategy, MSW rules, and staging/production validation for Angular templates. |
-| GOV-107 | P1  | Todo   | Governance | Portfolio control plane                  | The governance document and portfolio inventory are not held in a valid top-level Git worktree in this workspace, and manually duplicated dates, counts, lifecycle state, and implementation snapshots can drift. | Create a versioned portfolio-governance repository with `GOVERNANCE.md`, a machine-readable `portfolio.yaml`, GOV issue or Project links, and a checker that derives or validates board counts, lifecycle, remotes, required files, workflows, and GitHub settings. |
+| GOV-107 | P1  | Todo   | Governance | Portfolio control plane                  | The portfolio is now versioned in the `templates` repository with pinned submodules, but manually duplicated dates, counts, lifecycle state, and implementation snapshots can still drift. | Add a machine-readable `portfolio.yaml`, GOV issue or Project links, and a checker that derives or validates board counts, lifecycle, remotes, required files, workflows, and GitHub settings. |
 | GOV-108 | P1  | Todo   | Governance | All active remote repositories           | Main and release-tag policies are mostly documentary: only two repos have weak branch protection, seven rulesets are disabled, direct or force pushes remain possible, and publication is triggered by unprotected `v*` tags. | Define solo-maintainer and published-package ruleset profiles; require CI-backed pull requests where appropriate, block force push/deletion, allow explicit emergency owner bypass, protect release tags, and use release environments for registry publication. |
 | GOV-109 | P1  | Todo   | Security | All active remote repositories           | Workflow security is inconsistent with policy: audits can continue on error, permissions are often implicit, action tags are mutable, dependency review is uneven, and secret scanning/push protection is disabled on some active repos. | Add explicit least-privilege workflow permissions, make governed high/critical audits blocking, standardize dependency review, pin third-party actions to verified full SHAs with Renovate updates, and enable secret scanning plus push protection consistently. |
 | GOV-110 | P1  | Todo   | Maintenance | Active and archived GitHub repositories  | Local lifecycle classification is not reflected remotely; archived repos remain writable and receive Renovate PRs, while `adonis-template-monolith`, `django-template-monolith`, and `fastapi-template-microservice` are not configured as template repositories. | Archive governed archives on GitHub, close automation PRs with replacement guidance, disable their update automation, mark every active starter as a GitHub template, and document whether generated repos are one-time snapshots or have an upgrade path. |
-| GOV-111 | P1  | Todo   | Compliance | Active portfolio                         | Active assets violate required baselines: `fastapi-template-microservice` lacks CI/security/Docker-build workflows, `microservices-template-stack` lacks its own repo/CI/license, and `astro-template-fullstack` lacks `.dockerignore`. | Bring each asset to the active baseline with canonical checks and required files, or downgrade its lifecycle until compliant; add these checks to the portfolio conformance tool. |
+| GOV-111 | P1  | Todo   | Compliance | Active portfolio                         | Active assets violate required baselines: `fastapi-template-microservice` lacks CI/security/Docker-build workflows, `microservices-template-stack` lacks CI, and `astro-template-fullstack` lacks `.dockerignore`. | Bring each asset to the active baseline with canonical checks and required files, or downgrade its lifecycle until compliant; add these checks to the portfolio conformance tool. |
 | GOV-112 | P1  | Todo   | Tooling | Shared config packages and consumers     | Shared packages expose package-wide peers for export-specific runtimes, synthetic smoke tests do not exercise real sibling consumers, npm tarballs include repository internals, and releases do not enforce a tag/version/consumer compatibility contract. | Define peers per consumer through optional peers or package splits, add release-only real-consumer matrices, whitelist published files, verify packed artifacts, enforce tag equals package version, and document SemVer/support expectations. |
 | GOV-113 | P2  | Todo   | Documentation | All active starter repositories          | READMEs explain how to run the starters but generally do not explain how to adopt, rename, trim, and productionize them or where the support boundary ends. | Add a short "After creating from this template" checklist, rename/removal map, non-goals, deployment decision points, security/compliance disclaimer, and snapshot-versus-upgrade policy without turning READMEs into portfolio governance documents. |
 | GOV-114 | P2  | Todo   | Community | Public repositories                      | Public repos accept issues and publish packages but have no shared security reporting, contribution, conduct, or support policy. | Create a public `teo-garcia/.github` repository providing default `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SUPPORT.md`; keep repo-specific overrides only where behavior differs. |

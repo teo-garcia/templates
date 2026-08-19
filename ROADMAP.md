@@ -10,8 +10,8 @@ Stable standards and decision rights remain in [`GOVERNANCE.md`](GOVERNANCE.md).
 
 ## Current Priorities
 
-1. Establish the `templates` portfolio repository and pin every existing child
-   repository through Git submodules.
+1. Add a machine-readable portfolio inventory and validation for the new
+   `templates` repository and its pinned submodules.
 2. Close active-repository baseline gaps before adding more framework families.
 3. Finish the framework-neutral HTTP and async contracts for backend
    microservice templates.
