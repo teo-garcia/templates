@@ -24,12 +24,12 @@ owns the rules and acceptance boundaries.
 
 ## Planned Repositories
 
-| Repository | Intent |
-| --- | --- |
-| `django-template-microservice` | Django service under the governed microservice baseline |
+| Repository                     | Intent                                                    |
+| ------------------------------ | --------------------------------------------------------- |
+| `django-template-microservice` | Django service under the governed microservice baseline   |
 | `adonis-template-microservice` | AdonisJS service under the governed microservice baseline |
-| `click-template-layered` | Layered Python CLI starter |
-| `commander-template-layered` | Layered TypeScript CLI starter |
+| `click-template-layered`       | Layered Python CLI starter                                |
+| `commander-template-layered`   | Layered TypeScript CLI starter                            |
 
 `angular-template-fullstack` has a local scaffold but remains planned until its
 portfolio acceptance work is complete.

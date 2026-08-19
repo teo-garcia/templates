@@ -16,31 +16,31 @@ Maintained by [@teo-garcia](https://github.com/teo-garcia)
 
 ## Portfolio
 
-| Lane | Repository | Status |
-| --- | --- | --- |
-| Web | [`next-template-fullstack`](next-template-fullstack) | Active |
-| Web | [`react-router-template-fullstack`](react-router-template-fullstack) | Active |
-| Web | [`tanstack-template-fullstack`](tanstack-template-fullstack) | Active |
-| Web | [`astro-template-fullstack`](astro-template-fullstack) | Active |
-| Web | [`angular-template-fullstack`](angular-template-fullstack) | Planned |
-| Mobile | [`expo-template-mobile`](expo-template-mobile) | Active |
-| Backend | [`nest-template-monolith`](nest-template-monolith) | Active |
-| Backend | [`nest-template-microservice`](nest-template-microservice) | Active |
-| Backend | [`fastapi-template-monolith`](fastapi-template-monolith) | Active |
-| Backend | [`fastapi-template-microservice`](fastapi-template-microservice) | Active |
-| Backend | [`django-template-monolith`](django-template-monolith) | Active |
-| Backend | [`adonis-template-monolith`](adonis-template-monolith) | Active |
-| Shared config | [`eslint-config-shared`](eslint-config-shared) | Active |
-| Shared config | [`prettier-config-shared`](prettier-config-shared) | Active |
-| Shared config | [`tsconfig-shared`](tsconfig-shared) | Active |
-| Shared config | [`vitest-config-shared`](vitest-config-shared) | Active |
-| Shared config | [`ruff-config-shared`](ruff-config-shared) | Active |
-| Shared config | [`mypy-config-shared`](mypy-config-shared) | Active |
-| Shared config | [`pytest-config-shared`](pytest-config-shared) | Active |
-| Platform | [`microservices-template-stack`](microservices-template-stack) | Active |
-| Platform | [`observability-template-stack`](observability-template-stack) | Active |
-| Platform | [`terraform-template-baseline`](terraform-template-baseline) | Incubating |
-| Platform | [`helm-template-baseline`](helm-template-baseline) | Incubating |
+| Lane          | Repository                                                           | Status     |
+| ------------- | -------------------------------------------------------------------- | ---------- |
+| Web           | [`next-template-fullstack`](next-template-fullstack)                 | Active     |
+| Web           | [`react-router-template-fullstack`](react-router-template-fullstack) | Active     |
+| Web           | [`tanstack-template-fullstack`](tanstack-template-fullstack)         | Active     |
+| Web           | [`astro-template-fullstack`](astro-template-fullstack)               | Active     |
+| Web           | [`angular-template-fullstack`](angular-template-fullstack)           | Planned    |
+| Mobile        | [`expo-template-mobile`](expo-template-mobile)                       | Active     |
+| Backend       | [`nest-template-monolith`](nest-template-monolith)                   | Active     |
+| Backend       | [`nest-template-microservice`](nest-template-microservice)           | Active     |
+| Backend       | [`fastapi-template-monolith`](fastapi-template-monolith)             | Active     |
+| Backend       | [`fastapi-template-microservice`](fastapi-template-microservice)     | Active     |
+| Backend       | [`django-template-monolith`](django-template-monolith)               | Active     |
+| Backend       | [`adonis-template-monolith`](adonis-template-monolith)               | Active     |
+| Shared config | [`eslint-config-shared`](eslint-config-shared)                       | Active     |
+| Shared config | [`prettier-config-shared`](prettier-config-shared)                   | Active     |
+| Shared config | [`tsconfig-shared`](tsconfig-shared)                                 | Active     |
+| Shared config | [`vitest-config-shared`](vitest-config-shared)                       | Active     |
+| Shared config | [`ruff-config-shared`](ruff-config-shared)                           | Active     |
+| Shared config | [`mypy-config-shared`](mypy-config-shared)                           | Active     |
+| Shared config | [`pytest-config-shared`](pytest-config-shared)                       | Active     |
+| Platform      | [`microservices-template-stack`](microservices-template-stack)       | Active     |
+| Platform      | [`observability-template-stack`](observability-template-stack)       | Active     |
+| Platform      | [`terraform-template-baseline`](terraform-template-baseline)         | Incubating |
+| Platform      | [`helm-template-baseline`](helm-template-baseline)                   | Incubating |
 
 Archived packages remain available under [`archived/`](archived). Lifecycle
 decisions and planned repositories are tracked in the [roadmap](ROADMAP.md).
@@ -83,12 +83,12 @@ updated submodule pointer in this repository.
 
 ## Portfolio Documents
 
-| Document | Purpose |
-| --- | --- |
-| [`GOVERNANCE.md`](GOVERNANCE.md) | Stable portfolio standards and decision rules |
-| [`ROADMAP.md`](ROADMAP.md) | Priorities, planned work, and open design questions |
-| [`PARITY.md`](PARITY.md) | Observable contracts shared across template families |
-| [`LEARNING_PROJECTS.md`](LEARNING_PROJECTS.md) | Project ideas for exercising the templates |
+| Document                                       | Purpose                                              |
+| ---------------------------------------------- | ---------------------------------------------------- |
+| [`GOVERNANCE.md`](GOVERNANCE.md)               | Stable portfolio standards and decision rules        |
+| [`ROADMAP.md`](ROADMAP.md)                     | Priorities, planned work, and open design questions  |
+| [`PARITY.md`](PARITY.md)                       | Observable contracts shared across template families |
+| [`LEARNING_PROJECTS.md`](LEARNING_PROJECTS.md) | Project ideas for exercising the templates           |
 
 ---
 
