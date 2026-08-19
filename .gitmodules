@@ -1,0 +1,81 @@
+[submodule "adonis-template-monolith"]
+	path = adonis-template-monolith
+	url = https://github.com/teo-garcia/adonis-template-monolith.git
+[submodule "angular-template-fullstack"]
+	path = angular-template-fullstack
+	url = https://github.com/teo-garcia/angular-template-fullstack.git
+[submodule "astro-template-fullstack"]
+	path = astro-template-fullstack
+	url = https://github.com/teo-garcia/astro-template-fullstack.git
+[submodule "django-template-monolith"]
+	path = django-template-monolith
+	url = https://github.com/teo-garcia/django-template-monolith.git
+[submodule "eslint-config-shared"]
+	path = eslint-config-shared
+	url = https://github.com/teo-garcia/eslint-config-shared.git
+[submodule "expo-template-mobile"]
+	path = expo-template-mobile
+	url = https://github.com/teo-garcia/expo-template-mobile.git
+[submodule "fastapi-template-microservice"]
+	path = fastapi-template-microservice
+	url = https://github.com/teo-garcia/fastapi-template-microservice.git
+[submodule "fastapi-template-monolith"]
+	path = fastapi-template-monolith
+	url = https://github.com/teo-garcia/fastapi-template-monolith.git
+[submodule "helm-template-baseline"]
+	path = helm-template-baseline
+	url = https://github.com/teo-garcia/helm-template-baseline.git
+[submodule "microservices-template-stack"]
+	path = microservices-template-stack
+	url = https://github.com/teo-garcia/microservices-template-stack.git
+[submodule "mypy-config-shared"]
+	path = mypy-config-shared
+	url = https://github.com/teo-garcia/mypy-config-shared.git
+[submodule "nest-template-microservice"]
+	path = nest-template-microservice
+	url = https://github.com/teo-garcia/nest-template-microservice.git
+[submodule "nest-template-monolith"]
+	path = nest-template-monolith
+	url = https://github.com/teo-garcia/nest-template-monolith.git
+[submodule "next-template-fullstack"]
+	path = next-template-fullstack
+	url = https://github.com/teo-garcia/next-template-fullstack.git
+[submodule "observability-template-stack"]
+	path = observability-template-stack
+	url = https://github.com/teo-garcia/observability-template-stack.git
+[submodule "prettier-config-shared"]
+	path = prettier-config-shared
+	url = https://github.com/teo-garcia/prettier-config-shared.git
+[submodule "pytest-config-shared"]
+	path = pytest-config-shared
+	url = https://github.com/teo-garcia/pytest-config-shared.git
+[submodule "react-router-template-fullstack"]
+	path = react-router-template-fullstack
+	url = https://github.com/teo-garcia/react-router-template-fullstack.git
+[submodule "ruff-config-shared"]
+	path = ruff-config-shared
+	url = https://github.com/teo-garcia/ruff-config-shared.git
+[submodule "tanstack-template-fullstack"]
+	path = tanstack-template-fullstack
+	url = https://github.com/teo-garcia/tanstack-template-fullstack.git
+[submodule "terraform-template-baseline"]
+	path = terraform-template-baseline
+	url = https://github.com/teo-garcia/terraform-template-baseline.git
+[submodule "tsconfig-shared"]
+	path = tsconfig-shared
+	url = https://github.com/teo-garcia/tsconfig-shared.git
+[submodule "vitest-config-shared"]
+	path = vitest-config-shared
+	url = https://github.com/teo-garcia/vitest-config-shared.git
+[submodule "archived/python-core"]
+	path = archived/python-core
+	url = https://github.com/teo-garcia/python-core.git
+[submodule "archived/react-native-shared"]
+	path = archived/react-native-shared
+	url = https://github.com/teo-garcia/react-native-shared.git
+[submodule "archived/react-shared"]
+	path = archived/react-shared
+	url = https://github.com/teo-garcia/react-shared.git
+[submodule "archived/ts-core"]
+	path = archived/ts-core
+	url = https://github.com/teo-garcia/ts-core.git

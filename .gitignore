@@ -1,0 +1,6 @@
+# Workspace-local caches (never commit)
+.DS_Store
+.serena/
+.pnpm-store/
+**/.pnpm-store/
+**/.consumer-smoke/
