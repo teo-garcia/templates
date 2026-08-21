@@ -30,6 +30,8 @@ Maintained by [@teo-garcia](https://github.com/teo-garcia)
 | Backend       | [`fastapi-template-microservice`](fastapi-template-microservice)     | Active     |
 | Backend       | [`django-template-monolith`](django-template-monolith)               | Active     |
 | Backend       | [`adonis-template-monolith`](adonis-template-monolith)               | Active     |
+| Backend       | [`spring-template-monolith`](spring-template-monolith)               | Active     |
+| Backend       | [`spring-template-microservice`](spring-template-microservice)       | Active     |
 | Shared config | [`eslint-config-shared`](eslint-config-shared)                       | Active     |
 | Shared config | [`prettier-config-shared`](prettier-config-shared)                   | Active     |
 | Shared config | [`tsconfig-shared`](tsconfig-shared)                                 | Active     |

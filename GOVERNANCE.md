@@ -5,8 +5,8 @@ This document is the portfolio control layer: it defines what we build, what we 
 
 ## Document Meta
 
-- Version: `3.46`
-- Last updated: `2026-08-19`
+- Version: `3.47`
+- Last updated: `2026-08-21`
 - Owner: `@teo-garcia`
 
 ## Leadership Intent
@@ -79,6 +79,7 @@ Governance principles reflect implemented portfolio work. When a principle descr
 | Framework | FastAPI backend | Module-per-domain structure, Pydantic settings/schemas, FastAPI `Depends()` boundaries, async-safe HTTP clients, lifespan startup/shutdown, pytest/pytest-asyncio, Alembic where persistence exists, and standard backend API behavior. |
 | Framework | Django backend | Django Ninja typed API, Django ORM/migrations, pytest-django, `/docs` OpenAPI route or redirect, Django-native settings validation, and standard backend API behavior. |
 | Framework | AdonisJS backend | AdonisJS 7 runtime, `@adonisjs/tsconfig` instead of `tsconfig-shared`, Lucid ORM/migrations, VineJS validation, Japa tests, adonis-autoswagger OpenAPI docs, Adonis provider boundaries through `adonisrc.ts`, hot-hook HMR, and standard backend API behavior. |
+| Framework | Spring Boot backend | Spring Boot 3.4 Java 21 API with controller/service/repository layers, Bean Validation, Flyway, JPA/Hibernate, Actuator health, springdoc OpenAPI, Micrometer Prometheus + OTel tracing, and standard backend API behavior. |
 
 ## Technology Control Policy
 
@@ -107,7 +108,7 @@ This governance applies to active, planned, and incubating templates listed in t
 ## Technology Lanes
 
 - **Frontend/Fullstack**: Next.js, React Router, TanStack Start, Astro, and Angular full-stack templates, plus shared config packages.
-- **Backend API**: Nest templates (`monolith`, `microservice`), FastAPI templates (`fastapi-template-monolith`, `fastapi-template-microservice`), Django templates (`django-template-monolith`, `django-template-microservice`), AdonisJS templates (`adonis-template-monolith`, `adonis-template-microservice`).
+- **Backend API**: Nest templates (`monolith`, `microservice`), FastAPI templates (`fastapi-template-monolith`, `fastapi-template-microservice`), Django templates (`django-template-monolith`, `django-template-microservice`), AdonisJS templates (`adonis-template-monolith`, `adonis-template-microservice`), Spring Boot templates (`spring-template-monolith`, `spring-template-microservice`).
 - **CLI**: Click templates (`click-template-layered`), Commander templates (`commander-template-layered`).
 - **Mobile**: Expo templates (`expo-template-mobile`).
 - **Shared Config Packages**: TypeScript config packages (`eslint-config-shared`, `prettier-config-shared`, `tsconfig-shared`, `vitest-config-shared`) and Python config packages (`ruff-config-shared`, `mypy-config-shared`, `pytest-config-shared`). Angular consumers use the shared `./angular` exports. Runtime hooks, components, utilities, and test helpers stay in the consuming template.
@@ -140,6 +141,8 @@ Each lane keeps an internal family resemblance (scripts, docs shape, testing bas
 - `fastapi-template-monolith`
 - `fastapi-template-microservice`
 - `django-template-monolith`
+- `spring-template-monolith`
+- `spring-template-microservice`
 - `expo-template-mobile`
 - `tanstack-template-fullstack`
 - `ruff-config-shared`
@@ -171,7 +174,7 @@ Each lane keeps an internal family resemblance (scripts, docs shape, testing bas
 ## Current Open Work Snapshot
 
 The portfolio repository and submodule structure were verified locally and
-against public GitHub remotes on `2026-08-19`. The broader GitHub settings
+against public GitHub remotes on `2026-08-21`. The broader GitHub settings
 snapshot remains from `2026-07-20`.
 
 - Open board totals: `31 Todo`, `1 In Progress`, `3 Blocked`, `2 Incubating`.
@@ -207,6 +210,8 @@ snapshot remains from `2026-07-20`.
 | AdonisJS microservice API           | `adonis-template-microservice` (planned)  |
 | NestJS single service REST API      | `nest-template-monolith`                  |
 | NestJS messaging-first service      | `nest-template-microservice`              |
+| Spring Boot single service API      | `spring-template-monolith`                |
+| Spring Boot messaging-first service | `spring-template-microservice`            |
 | Click CLI with Layered pattern      | `click-template-layered` (planned)        |
 | Commander CLI with Layered pattern  | `commander-template-layered` (planned)    |
 | FastAPI single service API          | `fastapi-template-monolith`               |
@@ -480,6 +485,8 @@ Backend governance is organized by contract first, framework second. Every backe
 | Template | Framework Contract | Data + Infra | Testing | Shared Config Use | Unique Repo Facts to Preserve |
 | -------- | ------------------ | ------------ | ------- | ----------------- | ----------------------------- |
 | `adonis-template-monolith` | AdonisJS 7 TypeScript API with controllers, services, validators, middleware, exception handler, `adonisrc.ts` providers, generated OpenAPI/Swagger. | Lucid ORM, PostgreSQL, Redis, Docker dev/prod/observability Compose, pgAdmin local profile, Nginx production-like entrypoint, OTel, Prometheus, health endpoints, CORS, `/api/v1`. | Japa unit/functional tests. | `eslint-config-shared` base+node and `prettier-config-shared`; intentionally uses `@adonisjs/tsconfig`, not `tsconfig-shared`. | VineJS validation, `adonis-autoswagger`, hot-hook HMR, Adonis provider system. README version drift is tracked by GOV-101. |
+| `spring-template-monolith` | Spring Boot 3.4 Java 21 API with controller/service/repository, Bean Validation, Flyway, JPA/Hibernate, Actuator health, springdoc OpenAPI. | PostgreSQL via JPA/Flyway, Redis via Lettuce, Docker dev/prod/observability Compose, pgAdmin profile, Nginx production-like entrypoint, OTel via Micrometer tracing, Prometheus, health endpoints, CORS, `/api/v1`. | JUnit 5 + MockMvc, Testcontainers/H2, JaCoCo, Flyway test profile. | Spotless (google-java-format) + Checkstyle, `Makefile` + Maven Wrapper. | `mvnw`, `Hikari` pool, `logstash-logback` JSON, `springdoc` at `/docs` + `/openapi.json`. |
+| `spring-template-microservice` | Spring Boot 3.4 Java 21 microservice with same stack plus NATS JetStream, bounded service ownership. | Same as monolith plus NATS JetStream (`jnats` 2.22), one Postgres + NATS per service in Compose/stack, readiness checks for NATS. | Same as monolith plus NATS contract readiness. | Same as monolith, plus NATS dev dep `jnats`. | Governed broker = NATS JetStream; Redis for cache/rate-limit only; mirrors Nest micro `transport-node/jetstream` boundary. |
 | `nest-template-monolith` | NestJS 11 modular API with module-per-domain structure, dependency injection, decorator routing, guards, interceptors, filters, DTO validation, conditional Swagger through `DOCS_ENABLED`. | Prisma ORM/generated client, PostgreSQL, Redis through `ioredis`, Terminus health checks, Throttler, Helmet, Winston daily rotate logging, Prometheus, OTel, production-like Nginx Compose, pgAdmin local profile. | Jest unit tests and Supertest e2e with dedicated test DB. | `eslint-config-shared`, `prettier-config-shared`, `tsconfig-shared` base. | Multiple TS configs (`build`, `seed`, `spec`), Prisma Studio, `src/generated/` Prisma client, `@nestjs/cache-manager` pattern where caching is needed. |
 | `fastapi-template-monolith` | Async-first FastAPI API with module-per-domain structure, Pydantic validation/settings, dependency injection through `Depends()`, OpenAPI docs, lifespan startup/shutdown. | SQLAlchemy async, asyncpg, Alembic migrations, Redis, structlog, Prometheus, slowapi, OTel instrumentation for FastAPI/httpx/SQLAlchemy/Redis, production-like Nginx Compose, pgAdmin local profile. | pytest, pytest-asyncio, pytest-cov, e2e marker. | `ruff-config-shared`, `mypy-config-shared`, `pytest-config-shared` package baselines. | DB pool tuning env vars (`DATABASE_POOL_SIZE`, `DATABASE_MAX_OVERFLOW`, `DATABASE_ECHO`), `httpx.AsyncClient`, deterministic `app/seed.py`, Alembic reads app settings. |
 | `django-template-monolith` | Django 6 + Django Ninja API with Django-native settings, ASGI entrypoint, typed Ninja schemas/routes, native migrations, `/docs` OpenAPI route or redirect. | Django ORM, PostgreSQL via psycopg, Redis via django-redis, structlog, Prometheus, django-ratelimit, OTel instrumentation for Django/psycopg/Redis/ASGI, production-like Nginx Compose, pgAdmin local profile. | pytest-django, pytest-asyncio, pytest-cov, e2e marker. | `ruff-config-shared`, `mypy-config-shared`, `pytest-config-shared` package baselines. | `manage.py check --deploy`, Django security env vars (`SECURE_SSL_REDIRECT`, `SECURE_HSTS_SECONDS`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`), `LOG_JSON`, `THROTTLE_LIMIT`, uvicorn+gunicorn ASGI. |
@@ -628,6 +635,17 @@ Backend governance is organized by contract first, framework second. Every backe
 - `pydantic v2` for data validation and settings.
 - Never use mutable default arguments; never use bare `except:`.
 - Bind packages locally to avoid PyPI publishing.
+
+### Java Projects
+
+- Java `21` LTS (Temurin) as the baseline, Maven `3.9+` with Maven Wrapper (`mvnw`).
+- `pom.xml` as the single project definition — no Gradle co-build in the same repo.
+- `Spotless` + `google-java-format` for formatting and `Checkstyle` for lint (mirror ESLint/Prettier).
+- `JUnit 5` + `MockMvc` for all tests; `JaCoCo` for coverage (`target/site/jacoco`).
+- `Spring Boot 3.4` parent, `spring-boot-starter-*` for web/validation/data-jpa/actuator.
+- `Flyway` for migrations, `Hikari` for connection pooling, `Lettuce` for Redis.
+- `H2` for unit tests with `application-test.yml` isolated profile; `Testcontainers` for e2e where available.
+- Bind artifacts locally; no Maven Central publishing required for templates.
 
 ### Backend Runtime Defaults
 

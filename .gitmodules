@@ -79,3 +79,9 @@
 [submodule "archived/ts-core"]
 	path = archived/ts-core
 	url = https://github.com/teo-garcia/ts-core.git
+[submodule "spring-template-monolith"]
+	path = spring-template-monolith
+	url = https://github.com/teo-garcia/spring-template-monolith.git
+[submodule "spring-template-microservice"]
+	path = spring-template-microservice
+	url = https://github.com/teo-garcia/spring-template-microservice.git
