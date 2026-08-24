@@ -76,7 +76,7 @@ Built around the templates in this repo. Each project is scoped for a few focuse
 ---
 
 ## 5. Meal Plan & Pantry
-- **Stack:** `fastapi-template-monolith` + `astro-template-fullstack`
+- **Stack:** `spring-template-monolith` + `astro-template-fullstack`
 - **Auth:** No
 - **Domain:** Recipes → Meal Calendar → Shopping List
 - **MVP:**
@@ -84,7 +84,7 @@ Built around the templates in this repo. Each project is scoped for a few focuse
   - Plan meals on a weekly calendar.
   - Generate a shopping list aggregated by category/aisle.
   - Mark pantry items as already owned.
-- **Backend practice:** Aggregation, many-to-many recipe/ingredient model, FastAPI dependency injection.
+- **Backend practice:** Spring Data JPA relationships, aggregation queries, Bean Validation, and service boundaries.
 - **Frontend practice:** Astro islands, lightweight interactivity.
 - **Stretch:** Nutrition API integration, dietary filters.
 
@@ -244,8 +244,9 @@ Built around the templates in this repo. Each project is scoped for a few focuse
 
 | Template | Projects Used In |
 | --- | --- |
-| `fastapi-template-monolith` | 1, 5, 11, 14 |
+| `fastapi-template-monolith` | 1, 11, 14 |
 | `fastapi-template-microservice` | 8 |
+| `spring-template-monolith` | 5 |
 | `nest-template-monolith` | 2, 7, 10, 15 |
 | `nest-template-microservice` | 4, 13 |
 | `django-template-monolith` | 3, 6, 12 |

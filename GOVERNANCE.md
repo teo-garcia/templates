@@ -5,8 +5,8 @@ This document is the portfolio control layer: it defines what we build, what we 
 
 ## Document Meta
 
-- Version: `3.47`
-- Last updated: `2026-08-21`
+- Version: `3.48`
+- Last updated: `2026-08-24`
 - Owner: `@teo-garcia`
 
 ## Leadership Intent
@@ -79,7 +79,7 @@ Governance principles reflect implemented portfolio work. When a principle descr
 | Framework | FastAPI backend | Module-per-domain structure, Pydantic settings/schemas, FastAPI `Depends()` boundaries, async-safe HTTP clients, lifespan startup/shutdown, pytest/pytest-asyncio, Alembic where persistence exists, and standard backend API behavior. |
 | Framework | Django backend | Django Ninja typed API, Django ORM/migrations, pytest-django, `/docs` OpenAPI route or redirect, Django-native settings validation, and standard backend API behavior. |
 | Framework | AdonisJS backend | AdonisJS 7 runtime, `@adonisjs/tsconfig` instead of `tsconfig-shared`, Lucid ORM/migrations, VineJS validation, Japa tests, adonis-autoswagger OpenAPI docs, Adonis provider boundaries through `adonisrc.ts`, hot-hook HMR, and standard backend API behavior. |
-| Framework | Spring Boot backend | Spring Boot 3.4 Java 21 API with controller/service/repository layers, Bean Validation, Flyway, JPA/Hibernate, Actuator health, springdoc OpenAPI, Micrometer Prometheus + OTel tracing, and standard backend API behavior. |
+| Framework | Spring Boot backend | Spring Boot 4.1 Java 25 LTS API with controller/service/repository layers, Bean Validation, Flyway, JPA/Hibernate, Actuator health, springdoc OpenAPI, Micrometer Prometheus + OTel tracing, and standard backend API behavior. |
 
 ## Technology Control Policy
 
@@ -454,7 +454,7 @@ Angular web templates follow the same portfolio contracts as the other full-stac
 
 ---
 
-### Backend APIs (NestJS + FastAPI + Django + AdonisJS)
+### Backend APIs (NestJS + FastAPI + Django + AdonisJS + Spring Boot)
 
 Backend governance is organized by contract first, framework second. Every backend template must expose the same operational behavior while keeping its framework-native structure.
 
@@ -485,7 +485,7 @@ Backend governance is organized by contract first, framework second. Every backe
 | Template | Framework Contract | Data + Infra | Testing | Shared Config Use | Unique Repo Facts to Preserve |
 | -------- | ------------------ | ------------ | ------- | ----------------- | ----------------------------- |
 | `adonis-template-monolith` | AdonisJS 7 TypeScript API with controllers, services, validators, middleware, exception handler, `adonisrc.ts` providers, generated OpenAPI/Swagger. | Lucid ORM, PostgreSQL, Redis, Docker dev/prod/observability Compose, pgAdmin local profile, Nginx production-like entrypoint, OTel, Prometheus, health endpoints, CORS, `/api/v1`. | Japa unit/functional tests. | `eslint-config-shared` base+node and `prettier-config-shared`; intentionally uses `@adonisjs/tsconfig`, not `tsconfig-shared`. | VineJS validation, `adonis-autoswagger`, hot-hook HMR, Adonis provider system. README version drift is tracked by GOV-101. |
-| `spring-template-monolith` | Spring Boot 3.4 Java 21 API with controller/service/repository, Bean Validation, Flyway, JPA/Hibernate, Actuator health, springdoc OpenAPI. | PostgreSQL via JPA/Flyway, Redis via Lettuce, Docker dev/prod/observability Compose, pgAdmin profile, Nginx production-like entrypoint, OTel via Micrometer tracing, Prometheus, health endpoints, CORS, `/api/v1`. | JUnit 5 + MockMvc, Testcontainers/H2, JaCoCo, Flyway test profile. | Spotless (google-java-format) + Checkstyle, `Makefile` + Maven Wrapper. | `mvnw`, `Hikari` pool, `logstash-logback` JSON, `springdoc` at `/docs` + `/openapi.json`. |
+| `spring-template-monolith` | Spring Boot 4.1 Java 25 LTS API with controller/service/repository, Bean Validation, Flyway, JPA/Hibernate, Actuator health, and springdoc OpenAPI. | PostgreSQL via JPA/Flyway, Redis via Lettuce, Docker dev/prod/observability Compose, pgAdmin profile, Nginx production-like entrypoint, OTel via Micrometer tracing, Prometheus, health endpoints, CORS, `/api/v1`. | JUnit 5 + MockMvc with H2, JaCoCo coverage profile, and an isolated test profile. | Spotless (google-java-format) + Checkstyle, `Makefile` + tracked Maven Wrapper. | Maven 3.9.16, Hikari pool, Jackson 3, `logstash-logback` JSON, `springdoc` 3 at `/docs` + `/openapi.json`; Flyway runs as an explicit pre-start step. |
 | `spring-template-microservice` | Spring Boot 3.4 Java 21 microservice with same stack plus NATS JetStream, bounded service ownership. | Same as monolith plus NATS JetStream (`jnats` 2.22), one Postgres + NATS per service in Compose/stack, readiness checks for NATS. | Same as monolith plus NATS contract readiness. | Same as monolith, plus NATS dev dep `jnats`. | Governed broker = NATS JetStream; Redis for cache/rate-limit only; mirrors Nest micro `transport-node/jetstream` boundary. |
 | `nest-template-monolith` | NestJS 11 modular API with module-per-domain structure, dependency injection, decorator routing, guards, interceptors, filters, DTO validation, conditional Swagger through `DOCS_ENABLED`. | Prisma ORM/generated client, PostgreSQL, Redis through `ioredis`, Terminus health checks, Throttler, Helmet, Winston daily rotate logging, Prometheus, OTel, production-like Nginx Compose, pgAdmin local profile. | Jest unit tests and Supertest e2e with dedicated test DB. | `eslint-config-shared`, `prettier-config-shared`, `tsconfig-shared` base. | Multiple TS configs (`build`, `seed`, `spec`), Prisma Studio, `src/generated/` Prisma client, `@nestjs/cache-manager` pattern where caching is needed. |
 | `fastapi-template-monolith` | Async-first FastAPI API with module-per-domain structure, Pydantic validation/settings, dependency injection through `Depends()`, OpenAPI docs, lifespan startup/shutdown. | SQLAlchemy async, asyncpg, Alembic migrations, Redis, structlog, Prometheus, slowapi, OTel instrumentation for FastAPI/httpx/SQLAlchemy/Redis, production-like Nginx Compose, pgAdmin local profile. | pytest, pytest-asyncio, pytest-cov, e2e marker. | `ruff-config-shared`, `mypy-config-shared`, `pytest-config-shared` package baselines. | DB pool tuning env vars (`DATABASE_POOL_SIZE`, `DATABASE_MAX_OVERFLOW`, `DATABASE_ECHO`), `httpx.AsyncClient`, deterministic `app/seed.py`, Alembic reads app settings. |
@@ -638,11 +638,11 @@ Backend governance is organized by contract first, framework second. Every backe
 
 ### Java Projects
 
-- Java `21` LTS (Temurin) as the baseline, Maven `3.9+` with Maven Wrapper (`mvnw`).
+- Java `25` LTS (Temurin) as the baseline for new and upgraded Java templates, with a tracked Maven Wrapper (`mvnw`). The existing Spring microservice remains on Java 21 until it receives a separately scoped upgrade.
 - `pom.xml` as the single project definition — no Gradle co-build in the same repo.
 - `Spotless` + `google-java-format` for formatting and `Checkstyle` for lint (mirror ESLint/Prettier).
 - `JUnit 5` + `MockMvc` for all tests; `JaCoCo` for coverage (`target/site/jacoco`).
-- `Spring Boot 3.4` parent, `spring-boot-starter-*` for web/validation/data-jpa/actuator.
+- `Spring Boot 4.1` parent and its modular starters for Web MVC, validation, data JPA, Actuator, and tests.
 - `Flyway` for migrations, `Hikari` for connection pooling, `Lettuce` for Redis.
 - `H2` for unit tests with `application-test.yml` isolated profile; `Testcontainers` for e2e where available.
 - Bind artifacts locally; no Maven Central publishing required for templates.
@@ -668,8 +668,8 @@ framework-specific reason is documented in that repo:
   `meta.requestId`.
 - Local/test database names use the repo slug plus `_test` for test databases.
 - Backend monolith templates expose deterministic seed commands that recreate the same sample task set after migrations. Microservice seed policy must be explicit per bounded service and must not copy monolith sample data by default.
-- Redis defaults to `localhost:6379`, empty password, and `3600` seconds TTL in
-  normal runtime; tests may lower TTL or use an isolated Redis DB.
+- Redis defaults to `localhost:6379` with an empty password. Templates that cache
+  data must expose an explicit TTL; tests may lower it or use an isolated Redis DB.
 - Docker images bind application servers to `0.0.0.0`, expose the same port as
   the runtime default, and healthcheck `GET /health/live`.
 - Production-like backend monolith Compose paths use Nginx as the public entry point on `HTTP_PORT`. App, Postgres, and Redis ports stay internal in that override; Nginx forwards `X-Forwarded-For`, `X-Forwarded-Proto`, and `X-Real-IP`, enables request/response buffering, and passes through health, metrics, docs, and API routes.
