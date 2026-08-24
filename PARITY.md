@@ -159,13 +159,45 @@ nothing and hope":
 Ordered by severity. See the frontend sections above for the coverage rules that
 apply equally here.
 
-1. **Adonis has no rate limiting at all.** Nest has `ThrottlerGuard` + Redis
-   storage + `setHeaders` + a skip list for `/health`, `/metrics`, `/docs`.
-2. **Success envelope drift.** Nest wraps every non-health/metrics response in
-   `{success, statusCode, timestamp, path, method, data, meta}`; Adonis returns
-   raw payloads. Error envelopes already match.
-3. **Nest's OpenAPI is wrong because of (2)** — it documents the inner DTO while
-   the wire format is the envelope.
+1. ~~**Adonis has no rate limiting at all.**~~ **DONE (2026-08-20).** Adonis uses
+   `@adonisjs/limiter` with a Redis store (`config/limiter.ts`) plus
+   `app/middleware/throttle_middleware.ts`: `THROTTLE_LIMIT` requests per
+   `THROTTLE_TTL` seconds per client IP (100/60s, same env names as Nest),
+   `X-RateLimit-*` headers, and a 429 in the shared error envelope with
+   `Retry-After`. Skip list covers `/`, `/health*`, `/metrics`, `/docs*` plus
+   Adonis-only `/swagger` and `/openapi.json`. Covered by
+   `tests/functional/throttle.spec.ts`.
+
+   Follow-up found here: `config/redis.ts` never declares the
+   `@adonisjs/redis/types` module augmentation, so `RedisConnections` resolves to
+   `never` and a typed `connectionName: 'main'` will not compile. Worked around
+   by relying on the default connection; the augmentation is still missing.
+
+2. ~~**Success envelope drift.**~~ **DONE (2026-08-21).** Resolved in favour of
+   keeping the envelope. Adonis wraps successful responses via
+   `app/middleware/response_envelope_middleware.ts` in
+   `{success, statusCode, timestamp, path, method, data, meta}` with
+   `meta.{requestId, version, duration}`, matching Nest's `TransformInterceptor`.
+   Skips `/metrics` and `/health*` as Nest does, plus `/docs*`, `/swagger`,
+   `/openapi.json`; leaves 204 and any status >= 400 alone so the error envelope
+   still comes from `app/exceptions/handler.ts`.
+
+   **Canonical wire format for every backend template:** success →
+   `{success: true, …, data, meta}`; failure →
+   `{success: false, …, message, error, meta}`.
+
+3. ~~**Nest's OpenAPI is wrong because of (2)**~~ **DONE (2026-08-21).** Both
+   templates now document the wrapper rather than the inner payload:
+
+   - Adonis — `SuccessEnvelope` schema plus an `allOf` wrapper applied to every
+     2xx response in `app/services/openapi_schema_service.ts`.
+   - Nest — `SuccessEnvelopeDto` and a reusable `ApiEnvelopeResponse(type)`
+     decorator in `src/shared/dto/`, applied across `tasks.controller.ts` and the
+     previously undocumented root endpoint (`AppInfoDto`). 204 responses stay
+     body-less and are documented with `ApiNoContentResponse`.
+
+   Verified by curling a running server and diffing the payload against
+   `/docs-json`; asserted in `test/app.e2e-spec.ts`.
 4. **Health payload shape.** Nest returns Terminus `{status, info, error, details}`;
    Adonis returns `{checks, status}`, and reports `degraded` on `/health` but
    `error` on `/health/ready` for the same failure.
