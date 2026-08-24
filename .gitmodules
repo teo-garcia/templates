@@ -85,3 +85,9 @@
 [submodule "spring-template-microservice"]
 	path = spring-template-microservice
 	url = https://github.com/teo-garcia/spring-template-microservice.git
+[submodule "golangci-config-shared"]
+	path = golangci-config-shared
+	url = git@github.com:teo-garcia/golangci-config-shared.git
+[submodule "gotest-config-shared"]
+	path = gotest-config-shared
+	url = git@github.com:teo-garcia/gotest-config-shared.git
