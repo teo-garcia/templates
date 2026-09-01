@@ -6,6 +6,7 @@ When a template deviates, either fix the template or amend this document —
 silent divergence is the failure mode this file exists to prevent.
 
 Status: **frontend reconciled (2026-08-17)**, **backend pending**.
+Go backend added 2026-08-24 — see section 4b.
 
 Note: the template directories were renamed to `<stack>-template-fullstack`
 (e.g. `react-router-template-fullstack`, `next-template-fullstack`) after the
@@ -53,7 +54,19 @@ Where it lives per stack:
   builder owns coverage; it does not read the shared Vitest config)
 - Expo — `package.json` → `jest.collectCoverageFrom` / `coverageReporters` / `coverageDirectory`
 - Nest — `package.json` → `jest.collectCoverageFrom` / `coverageReporters` / `coverageDirectory`
+- Go (gin) — `gotest-config-shared`. The Go toolchain has none of the three
+  pieces this contract needs, so that package supplies them: it filters excluded
+  files out of the profile after collection (`go test` cannot exclude anything),
+  converts to LCOV (Go emits none), and owns the threshold check. `make coverage`
+  writes `coverage/coverage.out`, `coverage/lcov.info`, and
+  `coverage/coverage.html`.
 - Adonis — **not yet implemented** (no `coverage` script at all)
+
+Go-specific rule: coverage **must** be collected with `-coverpkg=./...`. Without
+it Go credits a package only for the tests declared inside it, so a layered
+service whose HTTP tests drive the middleware and domain packages reports a
+total far below reality (54% vs 20% measured on `gin-template-monolith`).
+`-covermode=atomic` is likewise mandatory whenever `-race` is on.
 
 ## 2. Health check
 
@@ -140,6 +153,44 @@ nothing and hope":
   missing. Do not "fix" this by adding an unused preset.
 - `NavigationPendingIndicator` is react-router-only (it needs `useNavigation`).
 
+## 4b. Go template (gin-template-monolith)
+
+Added 2026-08-24. It meets the canonical wire contract from section 6 — success
+`{success: true, …, data, meta}`, failure `{success: false, …, message, error, meta}`,
+list `data` of `{data, meta:{total, page, pageSize}}` — verified by curling a
+running server against live Postgres and Redis.
+
+Deliberate differences from the Nest/Adonis/Spring implementations:
+
+- **Envelopes are applied at the call site, not by an interceptor.** Nest,
+  Adonis, and Spring wrap responses in an interceptor with a path skip-list for
+  `/health*`, `/metrics`, and `/docs*`. The Go template exposes
+  `httpx.OK/Created/NoContent/RespondError` instead, and the operational routes
+  simply do not call them. The bytes on the wire are identical; there is no
+  skip-list to keep in sync. This is idiomatic Go, not drift.
+- **`/docs` is a self-contained page, not Swagger UI.** Bundling Swagger UI
+  would add a large asset dependency and loading it from a CDN would violate the
+  no-external-runtime-dependency rule and the template's own CSP. The page
+  fetches `/openapi.json` and renders it client-side.
+- **The OpenAPI document is hand-built in `internal/shared/openapi`**, not
+  generated from annotations by `swag`. That keeps `make build` free of a
+  codegen step and — the actual reason — makes it possible to document the
+  envelope via an `allOf` wrapper on every 2xx, satisfying section 6 item 3.
+- **Health payload follows Nest's Terminus shape** (`{status, info, error, details}`)
+  because Nest is the portfolio's backend reference. `/health` and
+  `/health/ready` return the *same* status and the *same* HTTP code for the same
+  failure — the Adonis split between `degraded` and `error` (section 6 item 4)
+  is not reproduced here. `/health/live` never touches a dependency, so a
+  database outage cannot cause a restart loop.
+- **Docs paths are `/docs` + `/openapi.json`**, matching Adonis's second alias
+  rather than Nest's `/docs-json`. Section 6 item 6 is still open; when it is
+  settled this template moves with the others.
+
+Contract items this template does satisfy that section 6 lists as open
+elsewhere: metrics use explicit histogram buckets (so p95/p99 work) and label
+`route` with the matched pattern (`/api/v1/tasks/:id`), never the raw URL, so
+cardinality stays bounded — item 5's complaint about Adonis does not apply.
+
 ## 5. Known deviations, accepted
 
 - **Astro `HealthStatus` owns its own `QueryClient`.** Astro hydrates each
@@ -198,9 +249,45 @@ apply equally here.
 
    Verified by curling a running server and diffing the payload against
    `/docs-json`; asserted in `test/app.e2e-spec.ts`.
-4. **Health payload shape.** Nest returns Terminus `{status, info, error, details}`;
-   Adonis returns `{checks, status}`, and reports `degraded` on `/health` but
-   `error` on `/health/ready` for the same failure.
+4. ~~**Health payload shape.**~~ **DONE (2026-09-01).** All **six** backends now
+   answer in the same contract the frontend templates already use
+   (`lib/health.ts`), rather than any one framework's health output:
+
+   ```json
+   { "status": "ok|degraded|down", "timestamp": "...", "version": "1",
+     "checks": { "database": "up|down", "redis": "up|down" } }
+   ```
+
+   - Aggregation: every check up -> `ok`, some up -> `degraded`, none up ->
+     `down`. HTTP 200 when `ok`, otherwise 503 so orchestrators drain the
+     instance.
+   - `/health/live` is liveness only -- it returns **no** `checks`, so a slow
+     dependency can never trigger a container restart.
+   - `/health` and `/health/ready` return the identical report. Reporting
+     `degraded` on one and `error` on the other for the same failure was drift;
+     it existed in Adonis, FastAPI and Django and is now gone from all three.
+   - `checks` reports exactly the dependencies every template shares
+     (`database`, `redis`). Spring contributes seven Actuator components
+     (`diskSpace`, `ssl`, `livenessState`, ...); only the shared two are
+     surfaced, so `checks.database` means the same thing everywhere and a full
+     disk cannot degrade one template but not the others.
+
+   Per template:
+
+   | Template | Where | Framework shape replaced |
+   | --- | --- | --- |
+   | Nest | `src/shared/health/health.contract.ts` + `health.service.ts` | Terminus `{info, error, details}` (**`@nestjs/terminus` removed**) |
+   | Adonis | `app/services/readiness_service.ts` | ad-hoc `{checks, status}` |
+   | Gin | `internal/shared/health/health.go` | Terminus-style `{info, error, details}` |
+   | Spring | `shared/health/HealthController.java` | Actuator `HealthDescriptor` |
+   | FastAPI | `app/shared/health/router.py` | ad-hoc `{status, checks}` |
+   | Django | `app/shared/health/views.py` | ad-hoc `{status, checks}` |
+
+   Verified by curling every running server, not just by tests. Note Spring's
+   `make check` passes against sources while `make start` runs `target/*.jar` --
+   a stale jar served the old payload until rebuilt, so always `make build`
+   before curling that one.
+
 5. **Metrics.** Nest uses `prom-client` with histogram buckets and default
    process metrics; Adonis hand-rolls counters with no buckets (so no p95/p99)
    and falls back to a raw URL label on unmatched routes (unbounded cardinality).
