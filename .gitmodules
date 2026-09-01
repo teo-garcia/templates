@@ -91,3 +91,6 @@
 [submodule "gotest-config-shared"]
 	path = gotest-config-shared
 	url = git@github.com:teo-garcia/gotest-config-shared.git
+[submodule "gin-template-monolith"]
+	path = gin-template-monolith
+	url = git@github.com:teo-garcia/gin-template-monolith.git

@@ -32,6 +32,7 @@ Maintained by [@teo-garcia](https://github.com/teo-garcia)
 | Backend       | [`adonis-template-monolith`](adonis-template-monolith)               | Active     |
 | Backend       | [`spring-template-monolith`](spring-template-monolith)               | Active     |
 | Backend       | [`spring-template-microservice`](spring-template-microservice)       | Active     |
+| Backend       | [`gin-template-monolith`](gin-template-monolith)                     | Active     |
 | Shared config | [`eslint-config-shared`](eslint-config-shared)                       | Active     |
 | Shared config | [`prettier-config-shared`](prettier-config-shared)                   | Active     |
 | Shared config | [`tsconfig-shared`](tsconfig-shared)                                 | Active     |
@@ -39,6 +40,8 @@ Maintained by [@teo-garcia](https://github.com/teo-garcia)
 | Shared config | [`ruff-config-shared`](ruff-config-shared)                           | Active     |
 | Shared config | [`mypy-config-shared`](mypy-config-shared)                           | Active     |
 | Shared config | [`pytest-config-shared`](pytest-config-shared)                       | Active     |
+| Shared config | [`golangci-config-shared`](golangci-config-shared)                   | Active     |
+| Shared config | [`gotest-config-shared`](gotest-config-shared)                       | Active     |
 | Platform      | [`microservices-template-stack`](microservices-template-stack)       | Active     |
 | Platform      | [`observability-template-stack`](observability-template-stack)       | Active     |
 | Platform      | [`terraform-template-baseline`](terraform-template-baseline)         | Incubating |

@@ -66,6 +66,7 @@ Governance principles reflect implemented portfolio work. When a principle descr
 | ----- | ---------- | ----------------- |
 | Language | Every Node.js / TypeScript repo | `pnpm`, strict TypeScript where applicable, shared TS config package, ESLint shared config, Prettier shared config, Vitest shared config where tests are TypeScript-native, stable scripts, lockfile, CI-friendly `check`, no runtime shared package dependency unless governed. |
 | Language | Every Python repo | Python 3.12+, `uv`, Ruff shared config, mypy shared config, pytest shared config, lockfile, CI-friendly `check`, typed settings where applicable, no runtime shared package dependency unless governed. |
+| Language | Every Go repo | Go 1.25+, Go modules with committed `go.sum`, `golangci-config-shared` for lint **and** format, `gotest-config-shared` for test and coverage, `Makefile` script surface, CI-friendly `check`, no runtime shared package dependency unless governed. |
 | Architecture | Every app template | One-command dev, one-command check, Docker + Compose, env validation, README with local/prod flow, health surface where applicable, production build/start path, and no host-only service dependencies. |
 | Architecture | Every backend monolith | REST API under `/api/v1`, OpenAPI docs, standard error envelope, request IDs, structured JSON logs, metrics, traces, CORS from env, security headers, rate limits, graceful shutdown, database migrations, rollback posture, and production-like Docker entrypoint. |
 | Architecture | Every backend microservice | The monolith operational baseline where it still fits, plus bounded service ownership, `microservices-template-stack` orchestration, NATS JetStream eventing, CloudEvents-style envelope, OpenAPI-generated HTTP clients, service-to-service auth, contract tests, broker/downstream readiness, trace propagation, and Helm delivery values. Remaining work lives in GOV-078 through GOV-087 and GOV-099. |
@@ -108,10 +109,10 @@ This governance applies to active, planned, and incubating templates listed in t
 ## Technology Lanes
 
 - **Frontend/Fullstack**: Next.js, React Router, TanStack Start, Astro, and Angular full-stack templates, plus shared config packages.
-- **Backend API**: Nest templates (`monolith`, `microservice`), FastAPI templates (`fastapi-template-monolith`, `fastapi-template-microservice`), Django templates (`django-template-monolith`, `django-template-microservice`), AdonisJS templates (`adonis-template-monolith`, `adonis-template-microservice`), Spring Boot templates (`spring-template-monolith`, `spring-template-microservice`).
+- **Backend API**: Nest templates (`monolith`, `microservice`), FastAPI templates (`fastapi-template-monolith`, `fastapi-template-microservice`), Django templates (`django-template-monolith`, `django-template-microservice`), AdonisJS templates (`adonis-template-monolith`, `adonis-template-microservice`), Spring Boot templates (`spring-template-monolith`, `spring-template-microservice`), Gin templates (`gin-template-monolith`).
 - **CLI**: Click templates (`click-template-layered`), Commander templates (`commander-template-layered`).
 - **Mobile**: Expo templates (`expo-template-mobile`).
-- **Shared Config Packages**: TypeScript config packages (`eslint-config-shared`, `prettier-config-shared`, `tsconfig-shared`, `vitest-config-shared`) and Python config packages (`ruff-config-shared`, `mypy-config-shared`, `pytest-config-shared`). Angular consumers use the shared `./angular` exports. Runtime hooks, components, utilities, and test helpers stay in the consuming template.
+- **Shared Config Packages**: TypeScript config packages (`eslint-config-shared`, `prettier-config-shared`, `tsconfig-shared`, `vitest-config-shared`) Python config packages (`ruff-config-shared`, `mypy-config-shared`, `pytest-config-shared`), and Go config packages (`golangci-config-shared`, `gotest-config-shared`). Angular consumers use the shared `./angular` exports. Runtime hooks, components, utilities, and test helpers stay in the consuming template.
 - **DevOps / Platform**: shared infrastructure and operations templates that span app repos. `microservices-template-stack` is active for local backend microservice orchestration. `observability-template-stack` is active for local backend metrics, logs, traces, dashboards, and alert examples. Terraform and Helm remain incubating until their contracts are locked. App repos still own app-specific Dockerfiles, CI, and instrumentation overlays.
 
 Each lane keeps an internal family resemblance (scripts, docs shape, testing baseline) while avoiding cross-lane coupling unless required.
@@ -143,6 +144,9 @@ Each lane keeps an internal family resemblance (scripts, docs shape, testing bas
 - `django-template-monolith`
 - `spring-template-monolith`
 - `spring-template-microservice`
+- `gin-template-monolith`
+- `golangci-config-shared`
+- `gotest-config-shared`
 - `expo-template-mobile`
 - `tanstack-template-fullstack`
 - `ruff-config-shared`
@@ -156,6 +160,7 @@ Each lane keeps an internal family resemblance (scripts, docs shape, testing bas
 - `angular-template-fullstack` — Angular full-stack web template with `@angular/ssr`; portfolio reference parity target is `next-template-fullstack`. See GOV-104.
 - `django-template-microservice`
 - `adonis-template-microservice`
+- `gin-template-microservice`
 - `click-template-layered`
 - `commander-template-layered`
 
@@ -212,6 +217,8 @@ snapshot remains from `2026-07-20`.
 | NestJS messaging-first service      | `nest-template-microservice`              |
 | Spring Boot single service API      | `spring-template-monolith`                |
 | Spring Boot messaging-first service | `spring-template-microservice`            |
+| Gin single service API              | `gin-template-monolith`                   |
+| Gin microservice API                | `gin-template-microservice` (planned)     |
 | Click CLI with Layered pattern      | `click-template-layered` (planned)        |
 | Commander CLI with Layered pattern  | `commander-template-layered` (planned)    |
 | FastAPI single service API          | `fastapi-template-monolith`               |
@@ -225,6 +232,8 @@ snapshot remains from `2026-07-20`.
 | Shared Python lint + format config  | `ruff-config-shared`                      |
 | Shared Python type-check config     | `mypy-config-shared`                      |
 | Shared Python test + coverage config | `pytest-config-shared`                   |
+| Shared Go lint + format config      | `golangci-config-shared`                  |
+| Shared Go test + coverage config    | `gotest-config-shared`                    |
 | Local backend microservices stack   | `microservices-template-stack`            |
 | Local backend observability stack   | `observability-template-stack`            |
 
@@ -487,6 +496,7 @@ Backend governance is organized by contract first, framework second. Every backe
 | `adonis-template-monolith` | AdonisJS 7 TypeScript API with controllers, services, validators, middleware, exception handler, `adonisrc.ts` providers, generated OpenAPI/Swagger. | Lucid ORM, PostgreSQL, Redis, Docker dev/prod/observability Compose, pgAdmin local profile, Nginx production-like entrypoint, OTel, Prometheus, health endpoints, CORS, `/api/v1`. | Japa unit/functional tests. | `eslint-config-shared` base+node and `prettier-config-shared`; intentionally uses `@adonisjs/tsconfig`, not `tsconfig-shared`. | VineJS validation, `adonis-autoswagger`, hot-hook HMR, Adonis provider system. README version drift is tracked by GOV-101. |
 | `spring-template-monolith` | Spring Boot 4.1 Java 25 LTS API with controller/service/repository, Bean Validation, Flyway, JPA/Hibernate, Actuator health, and springdoc OpenAPI. | PostgreSQL via JPA/Flyway, Redis via Lettuce, Docker dev/prod/observability Compose, pgAdmin profile, Nginx production-like entrypoint, OTel via Micrometer tracing, Prometheus, health endpoints, CORS, `/api/v1`. | JUnit 5 + MockMvc with H2, JaCoCo coverage profile, and an isolated test profile. | Spotless (google-java-format) + Checkstyle, `Makefile` + tracked Maven Wrapper. | Maven 3.9.16, Hikari pool, Jackson 3, `logstash-logback` JSON, `springdoc` 3 at `/docs` + `/openapi.json`; Flyway runs as an explicit pre-start step. |
 | `spring-template-microservice` | Spring Boot 3.4 Java 21 microservice with same stack plus NATS JetStream, bounded service ownership. | Same as monolith plus NATS JetStream (`jnats` 2.22), one Postgres + NATS per service in Compose/stack, readiness checks for NATS. | Same as monolith plus NATS contract readiness. | Same as monolith, plus NATS dev dep `jnats`. | Governed broker = NATS JetStream; Redis for cache/rate-limit only; mirrors Nest micro `transport-node/jetstream` boundary. |
+| `gin-template-monolith` | Gin 1.11 Go API with handler/service/repository layers, `Register(*gin.RouterGroup)` module mounting, middleware pipeline for correlation/logging/errors/CORS/security/throttle/timeout, and a hand-built OpenAPI document served at `/docs` + `/openapi.json`. | pgx/v5 + pgxpool, PostgreSQL, Redis via go-redis/v9, golang-migrate with embedded SQL, Docker dev/prod/observability Compose, pgAdmin `tools` profile, Nginx production-like entrypoint, OTel via otelgin, Prometheus, health endpoints, CORS, `/api/v1`. | stdlib `testing` + `httptest`, race detector, `-shuffle=on`, in-memory repositories so `make test` needs no infrastructure. | `golangci-config-shared` (lint + format), `gotest-config-shared` (test + coverage). | `log/slog` JSON logging with no logging dependency; response envelopes applied by explicit responders rather than an interceptor skip-list; migrations embedded in the binary; separate `api`/`migrate`/`seed` binaries from one image. |
 | `nest-template-monolith` | NestJS 11 modular API with module-per-domain structure, dependency injection, decorator routing, guards, interceptors, filters, DTO validation, conditional Swagger through `DOCS_ENABLED`. | Prisma ORM/generated client, PostgreSQL, Redis through `ioredis`, Terminus health checks, Throttler, Helmet, Winston daily rotate logging, Prometheus, OTel, production-like Nginx Compose, pgAdmin local profile. | Jest unit tests and Supertest e2e with dedicated test DB. | `eslint-config-shared`, `prettier-config-shared`, `tsconfig-shared` base. | Multiple TS configs (`build`, `seed`, `spec`), Prisma Studio, `src/generated/` Prisma client, `@nestjs/cache-manager` pattern where caching is needed. |
 | `fastapi-template-monolith` | Async-first FastAPI API with module-per-domain structure, Pydantic validation/settings, dependency injection through `Depends()`, OpenAPI docs, lifespan startup/shutdown. | SQLAlchemy async, asyncpg, Alembic migrations, Redis, structlog, Prometheus, slowapi, OTel instrumentation for FastAPI/httpx/SQLAlchemy/Redis, production-like Nginx Compose, pgAdmin local profile. | pytest, pytest-asyncio, pytest-cov, e2e marker. | `ruff-config-shared`, `mypy-config-shared`, `pytest-config-shared` package baselines. | DB pool tuning env vars (`DATABASE_POOL_SIZE`, `DATABASE_MAX_OVERFLOW`, `DATABASE_ECHO`), `httpx.AsyncClient`, deterministic `app/seed.py`, Alembic reads app settings. |
 | `django-template-monolith` | Django 6 + Django Ninja API with Django-native settings, ASGI entrypoint, typed Ninja schemas/routes, native migrations, `/docs` OpenAPI route or redirect. | Django ORM, PostgreSQL via psycopg, Redis via django-redis, structlog, Prometheus, django-ratelimit, OTel instrumentation for Django/psycopg/Redis/ASGI, production-like Nginx Compose, pgAdmin local profile. | pytest-django, pytest-asyncio, pytest-cov, e2e marker. | `ruff-config-shared`, `mypy-config-shared`, `pytest-config-shared` package baselines. | `manage.py check --deploy`, Django security env vars (`SECURE_SSL_REDIRECT`, `SECURE_HSTS_SECONDS`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`), `LOG_JSON`, `THROTTLE_LIMIT`, uvicorn+gunicorn ASGI. |
@@ -638,7 +648,7 @@ Backend governance is organized by contract first, framework second. Every backe
 
 ### Java Projects
 
-- Java `25` LTS (Temurin) as the baseline for new and upgraded Java templates, with a tracked Maven Wrapper (`mvnw`). The existing Spring microservice remains on Java 21 until it receives a separately scoped upgrade.
+- Java `25` LTS (Temurin recommended — GraalVM 25 LTS acceptable where IT mandates, e.g. `25.0.4-graal`) as the baseline for new and upgraded Java templates, with a tracked Maven Wrapper (`mvnw`). Templates pin major `25` only; patch floats with LTS updates (`25.0.3` → `25.0.4` etc.) via `pom.xml: java.version=25`, `docker/Dockerfile: eclipse-temurin:25-*`, and CI `java-version: "25"`. The existing Spring microservice remains on Java 21 until it receives a separately scoped upgrade.
 - `pom.xml` as the single project definition — no Gradle co-build in the same repo.
 - `Spotless` + `google-java-format` for formatting and `Checkstyle` for lint (mirror ESLint/Prettier).
 - `JUnit 5` + `MockMvc` for all tests; `JaCoCo` for coverage (`target/site/jacoco`).
@@ -646,6 +656,21 @@ Backend governance is organized by contract first, framework second. Every backe
 - `Flyway` for migrations, `Hikari` for connection pooling, `Lettuce` for Redis.
 - `H2` for unit tests with `application-test.yml` isolated profile; `Testcontainers` for e2e where available.
 - Bind artifacts locally; no Maven Central publishing required for templates.
+
+### Go Projects
+
+- Go `1.25+` as the baseline, declared in `go.mod` and read by CI through `go-version-file`.
+- Go modules with a committed `go.sum`; `go.sum` is marked `linguist-generated` in `.gitattributes`.
+- `golangci-lint` v2 for **both** linting and formatting. golangci-lint v2 owns `run` and `fmt` from one config file, so Go gets a single lint+format package (`golangci-config-shared`) the way Python gets Ruff — not an ESLint/Prettier split.
+- Formatting is `gofumpt` (extra rules) plus `gci` with import grouping standard → default → `prefix(github.com/teo-garcia)`.
+- `gotest-config-shared` owns test and coverage settings. The Go toolchain has no coverage exclusions, no LCOV output, and no threshold check, so that package supplies all three on top of the standard profile format.
+- Tests run with `-race -shuffle=on`; `-covermode=atomic` is required whenever `-race` is on, and `-coverpkg=./...` is required so a layered service is credited for coverage its HTTP tests produce in other packages.
+- `golangci-lint` is pinned by version in the `Makefile` and CI and installed into a repo-local `./bin`, so lint tooling never enters the application module graph.
+- Go templates use a `Makefile` for the script surface; there is no `package.json` equivalent.
+- Structured logging uses stdlib `log/slog`. No third-party logging dependency.
+- Configuration is parsed and validated once at startup into a typed struct; nothing else reads `os.Getenv`.
+- Errors are typed domain values translated to HTTP at the framework boundary. Never return driver text, SQL, or wrapped internals to a client.
+- Bind modules locally; no proxy publishing is required for templates.
 
 ### Backend Runtime Defaults
 
