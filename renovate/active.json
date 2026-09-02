@@ -17,6 +17,30 @@
   "vulnerabilityAlerts": {
     "enabled": true,
     "addLabels": ["security"],
-    "automerge": false
-  }
+    "automerge": false,
+    "groupName": null
+  },
+  "packageRules": [
+    {
+      "description": "Group routine non-major updates while keeping shared configuration releases separate",
+      "groupName": "routine dependencies",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "!@teo-garcia/**",
+        "!/^teo-(ruff|mypy|pytest)-config-shared$/",
+        "!github.com/teo-garcia/**"
+      ]
+    },
+    {
+      "description": "Review shared configuration releases after their producer checks pass",
+      "groupName": "teo-garcia shared configs",
+      "matchPackageNames": [
+        "@teo-garcia/**",
+        "/^teo-(ruff|mypy|pytest)-config-shared$/",
+        "github.com/teo-garcia/**"
+      ],
+      "dependencyDashboardApproval": true,
+      "reviewers": ["teo-garcia"]
+    }
+  ]
 }
