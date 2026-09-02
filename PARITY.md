@@ -331,5 +331,10 @@ apply equally here.
    `/docs-json` via `jsonDocumentUrl`; Adonis dropped its duplicate `/swagger`
    route and points its UI at `/openapi.json`. FastAPI additionally serves
    `/redoc`, which is an accepted extra rather than drift.
-7. **Coverage.** Adonis has no `coverage` script; Nest's `collectCoverageFrom`
-   is `src/**/*.(t|j)s`, which sweeps in the generated Prisma client.
+7. ~~**Coverage.**~~ **DONE (2026-09-02).** Adonis gained `pnpm coverage` (c8
+   wrapping `node ace test`, `.c8rc.json`, text/lcov/html into `coverage/`).
+   Nest's `collectCoverageFrom` no longer sweeps in the generated Prisma client,
+   specs, type declarations or bootstrap files -- reported coverage dropped from
+   a flattering number to an honest 7.9%, which is the real figure for a
+   template with one unit test. Both Python templates now emit lcov and html
+   alongside the terminal summary. See section 1 for the revised threshold rule.
