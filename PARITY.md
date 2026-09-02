@@ -41,11 +41,22 @@ The runner differs; the contract does not.
 | Output directory | `coverage/` (gitignored) |
 | Include | source directories only (`app/`, `src/`, `lib/`, `features/`, `components/`) |
 | Exclude | tests and specs, `*.d.ts`, `__mocks__/`, `lib/test/`, `lib/mocks/`, generated code (`*.gen.ts`, Prisma clients), framework entrypoints (`main.ts`, `server.ts`, bootstrap files), config files |
-| Thresholds | **none enforced** — deliberate |
+| Thresholds | **opt-in per template**, not mandated — see below |
 
-Why no thresholds: a template ships a starter suite, so any floor would fail
-every project generated from it on day one. If a floor is ever wanted, it has to
-be added to every template in the same change, not one at a time.
+On thresholds (revised 2026-09-02): the original rule was "none enforced
+anywhere", on the reasoning that a starter suite would fail any floor on day one.
+That turned out to be wrong for half the portfolio — the Python templates already
+clear 80% (`fastapi` 82.9%, `django` 84.3%) and enforce `fail_under = 80`.
+Deleting a passing quality gate to match templates with weaker suites is
+levelling down, so the rule is now:
+
+- A template **may** enforce a floor when its own suite clears it. Currently
+  only the Python templates do.
+- No floor is imposed on a template whose starter suite cannot meet it. Nest is
+  at 7.9% with a single unit test; a floor there would fail every generated
+  project immediately.
+- Raising a floor is a per-template decision; what stays portfolio-wide is the
+  command, the provider, the reporters, the output directory and the exclusions.
 
 Where it lives per stack:
 
@@ -60,7 +71,7 @@ Where it lives per stack:
   converts to LCOV (Go emits none), and owns the threshold check. `make coverage`
   writes `coverage/coverage.out`, `coverage/lcov.info`, and
   `coverage/coverage.html`.
-- Adonis — **not yet implemented** (no `coverage` script at all)
+- Adonis — `.c8rc.json` + `pnpm coverage` (c8 wrapping `node ace test`)
 
 Go-specific rule: coverage **must** be collected with `-coverpkg=./...`. Without
 it Go credits a package only for the tests declared inside it, so a layered
