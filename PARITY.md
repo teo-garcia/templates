@@ -288,6 +288,18 @@ apply equally here.
    a stale jar served the old payload until rebuilt, so always `make build`
    before curling that one.
 
+4b. ~~**Success envelope absent in FastAPI and Django.**~~ **DONE (2026-09-02).**
+   Both Python backends returned raw payloads on success while every other
+   template wrapped them; they only had the error envelope. Both now ship
+   `app/shared/middleware/response_envelope.py` producing the canonical
+   `{success, statusCode, timestamp, path, method, data, meta}` with
+   `meta.duration` in whole milliseconds, and both rewrite their OpenAPI in the
+   same pass (`app/shared/openapi/envelope.py`) so 2xx schemas are an `allOf`
+   against a `SuccessEnvelope` component rather than the bare payload.
+
+   With this, **all six backends** emit both envelopes identically. Verified by
+   curling each running server.
+
 5. **Metrics.** Nest uses `prom-client` with histogram buckets and default
    process metrics; Adonis hand-rolls counters with no buckets (so no p95/p99)
    and falls back to a raw URL label on unmatched routes (unbounded cardinality).
