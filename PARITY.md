@@ -314,7 +314,10 @@ apply equally here.
 5. **Metrics.** Nest uses `prom-client` with histogram buckets and default
    process metrics; Adonis hand-rolls counters with no buckets (so no p95/p99)
    and falls back to a raw URL label on unmatched routes (unbounded cardinality).
-6. **Docs paths.** Nest: `/docs` + `/docs-json`. Adonis: `/docs` + `/swagger` +
-   `/openapi.json`.
+6. ~~**Docs paths.**~~ **DONE (2026-09-02).** Every backend serves exactly
+   `/docs` (UI) and `/openapi.json` (spec). Nest moved off Swagger's default
+   `/docs-json` via `jsonDocumentUrl`; Adonis dropped its duplicate `/swagger`
+   route and points its UI at `/openapi.json`. FastAPI additionally serves
+   `/redoc`, which is an accepted extra rather than drift.
 7. **Coverage.** Adonis has no `coverage` script; Nest's `collectCoverageFrom`
    is `src/**/*.(t|j)s`, which sweeps in the generated Prisma client.
