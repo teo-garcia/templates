@@ -14,41 +14,30 @@ Maintained by [@teo-garcia](https://github.com/teo-garcia)
 
 ---
 
-## Portfolio
+## Available templates
 
-| Lane          | Repository                                                           | Status     |
-| ------------- | -------------------------------------------------------------------- | ---------- |
-| Web           | [`next-template-fullstack`](next-template-fullstack)                 | Active     |
-| Web           | [`react-router-template-fullstack`](react-router-template-fullstack) | Active     |
-| Web           | [`tanstack-template-fullstack`](tanstack-template-fullstack)         | Active     |
-| Web           | [`astro-template-fullstack`](astro-template-fullstack)               | Active     |
-| Web           | [`angular-template-fullstack`](angular-template-fullstack)           | Planned    |
-| Mobile        | [`expo-template-mobile`](expo-template-mobile)                       | Active     |
-| Backend       | [`nest-template-monolith`](nest-template-monolith)                   | Active     |
-| Backend       | [`nest-template-microservice`](nest-template-microservice)           | Active     |
-| Backend       | [`fastapi-template-monolith`](fastapi-template-monolith)             | Active     |
-| Backend       | [`fastapi-template-microservice`](fastapi-template-microservice)     | Active     |
-| Backend       | [`django-template-monolith`](django-template-monolith)               | Active     |
-| Backend       | [`adonis-template-monolith`](adonis-template-monolith)               | Active     |
-| Backend       | [`spring-template-monolith`](spring-template-monolith)               | Active     |
-| Backend       | [`spring-template-microservice`](spring-template-microservice)       | Active     |
-| Backend       | [`gin-template-monolith`](gin-template-monolith)                     | Active     |
-| Shared config | [`eslint-config-shared`](eslint-config-shared)                       | Active     |
-| Shared config | [`prettier-config-shared`](prettier-config-shared)                   | Active     |
-| Shared config | [`tsconfig-shared`](tsconfig-shared)                                 | Active     |
-| Shared config | [`vitest-config-shared`](vitest-config-shared)                       | Active     |
-| Shared config | [`ruff-config-shared`](ruff-config-shared)                           | Active     |
-| Shared config | [`mypy-config-shared`](mypy-config-shared)                           | Active     |
-| Shared config | [`pytest-config-shared`](pytest-config-shared)                       | Active     |
-| Shared config | [`golangci-config-shared`](golangci-config-shared)                   | Active     |
-| Shared config | [`gotest-config-shared`](gotest-config-shared)                       | Active     |
-| Platform      | [`microservices-template-stack`](microservices-template-stack)       | Active     |
-| Platform      | [`observability-template-stack`](observability-template-stack)       | Active     |
-| Platform      | [`terraform-template-baseline`](terraform-template-baseline)         | Incubating |
-| Platform      | [`helm-template-baseline`](helm-template-baseline)                   | Incubating |
+| Lane    | Repository                                                           |
+| ------- | -------------------------------------------------------------------- |
+| Web     | [`next-template-fullstack`](next-template-fullstack)                 |
+| Web     | [`react-router-template-fullstack`](react-router-template-fullstack) |
+| Web     | [`tanstack-template-fullstack`](tanstack-template-fullstack)         |
+| Web     | [`astro-template-fullstack`](astro-template-fullstack)               |
+| Mobile  | [`expo-template-mobile`](expo-template-mobile)                       |
+| Backend | [`nest-template-monolith`](nest-template-monolith)                   |
+| Backend | [`fastapi-template-monolith`](fastapi-template-monolith)             |
+| Backend | [`django-template-monolith`](django-template-monolith)               |
+| Backend | [`adonis-template-monolith`](adonis-template-monolith)               |
+| Backend | [`spring-template-monolith`](spring-template-monolith)               |
+| Backend | [`gin-template-monolith`](gin-template-monolith)                     |
 
-Archived packages remain available under [`archived/`](archived). Lifecycle
-decisions and planned repositories are tracked in the [roadmap](ROADMAP.md).
+## Shared tooling
+
+| Ecosystem     | Packages                                                                                                                                                                                 |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript    | [`eslint-config-shared`](eslint-config-shared), [`prettier-config-shared`](prettier-config-shared), [`tsconfig-shared`](tsconfig-shared), [`vitest-config-shared`](vitest-config-shared) |
+| Python        | [`ruff-config-shared`](ruff-config-shared), [`mypy-config-shared`](mypy-config-shared), [`pytest-config-shared`](pytest-config-shared)                                                   |
+| Go            | [`golangci-config-shared`](golangci-config-shared), [`gotest-config-shared`](gotest-config-shared)                                                                                       |
+| Observability | [`observability-template-stack`](observability-template-stack)                                                                                                                           |
 
 ---
 
@@ -86,14 +75,10 @@ updated submodule pointer in this repository.
 
 ---
 
-## Portfolio Documents
+## Portfolio policy
 
-| Document                                       | Purpose                                              |
-| ---------------------------------------------- | ---------------------------------------------------- |
-| [`GOVERNANCE.md`](GOVERNANCE.md)               | Stable portfolio standards and decision rules        |
-| [`ROADMAP.md`](ROADMAP.md)                     | Priorities, planned work, and open design questions  |
-| [`PARITY.md`](PARITY.md)                       | Observable contracts shared across template families |
-| [`LEARNING_PROJECTS.md`](LEARNING_PROJECTS.md) | Project ideas for exercising the templates           |
+Maintainers can find lifecycle, contracts, and current portfolio work in
+[`GOVERNANCE.md`](GOVERNANCE.md).
 
 ---
 
