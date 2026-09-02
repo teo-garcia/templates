@@ -311,9 +311,21 @@ apply equally here.
    With this, **all six backends** emit both envelopes identically. Verified by
    curling each running server.
 
-5. **Metrics.** Nest uses `prom-client` with histogram buckets and default
-   process metrics; Adonis hand-rolls counters with no buckets (so no p95/p99)
-   and falls back to a raw URL label on unmatched routes (unbounded cardinality).
+5. ~~**Metrics.**~~ **DONE (2026-09-02).** Adonis now uses `prom-client` like
+   the other backends instead of hand-rolled counters, so `/metrics` exposes a
+   real `http_request_duration_seconds` histogram (11 buckets, so p95/p99 are
+   answerable) plus default process metrics. The previous `_sum`/`_count` pair
+   could not produce percentiles, which meant shared Grafana dashboards could
+   not work across templates.
+
+   **Correction to the original audit:** it also claimed unbounded label
+   cardinality from a raw-URL fallback on unmatched routes. That was wrong.
+   Adonis runs `router.use` middleware only for *matched* routes, so a 404 scan
+   never reaches the metrics middleware and produced no series at all --
+   verified by probing unknown paths and finding no matching label sets. The
+   fallback is now a constant `unmatched` anyway, as defence if the middleware
+   is ever moved to the server pipeline.
+
 6. ~~**Docs paths.**~~ **DONE (2026-09-02).** Every backend serves exactly
    `/docs` (UI) and `/openapi.json` (spec). Nest moved off Swagger's default
    `/docs-json` via `jsonDocumentUrl`; Adonis dropped its duplicate `/swagger`
