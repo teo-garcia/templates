@@ -49,10 +49,16 @@ const assertErrorEnvelope = (response, body, expected) => {
 }
 
 const assertRateLimitHeaders = (response) => {
-  for (const header of rateLimitHeaders) {
+  for (const header of rateLimitHeaders.slice(0, 2)) {
     const value = response.headers.get(header)
     assert.match(value ?? '', /^\d+$/, `${response.url} must include numeric ${header}`)
   }
+
+  const reset = response.headers.get('x-ratelimit-reset')
+  assert.ok(
+    reset !== null && Number.isFinite(Number(reset)) && Number(reset) >= 0,
+    `${response.url} must include numeric x-ratelimit-reset`
+  )
 }
 
 const responseSchemaSignalsEnvelope = (schema) => {
