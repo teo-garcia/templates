@@ -1,0 +1,11 @@
+name: Web conformance
+description: Verify the shared application shell and health behavior
+
+inputs:
+  base_url:
+    description: Base URL of the running web application
+    required: true
+
+runs:
+  using: node24
+  main: run.mjs

@@ -1,0 +1,11 @@
+name: Backend conformance
+description: Verify the shared backend HTTP and operational contract
+
+inputs:
+  base_url:
+    description: Base URL of the running backend
+    required: true
+
+runs:
+  using: node24
+  main: run.mjs
