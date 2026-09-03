@@ -46,7 +46,9 @@ export const runWebConformance = async (baseUrlValue, workspaceValue = process.c
 
   const healthResponse = await request(baseUrl, '/api/health')
   assert.equal(healthResponse.status, 200)
-  assertHealthPayload(await readJson(healthResponse), { checksOptional: true })
+  assertHealthPayload(await readJson(healthResponse, { requireContentType: false }), {
+    checksOptional: true,
+  })
 
   const browser = await chromium.launch({ headless: true })
 

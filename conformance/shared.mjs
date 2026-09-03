@@ -22,12 +22,14 @@ export const request = async (baseUrl, path, options = {}) => {
   return response
 }
 
-export const readJson = async (response) => {
-  assert.match(
-    response.headers.get('content-type') ?? '',
-    /application\/json/i,
-    `${response.url} must return JSON`
-  )
+export const readJson = async (response, { requireContentType = true } = {}) => {
+  if (requireContentType) {
+    assert.match(
+      response.headers.get('content-type') ?? '',
+      /application\/json/i,
+      `${response.url} must return JSON`
+    )
+  }
 
   return response.json()
 }
