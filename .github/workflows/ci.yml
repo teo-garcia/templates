@@ -23,6 +23,12 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Validate Renovate preset
+        env:
+          # renovate: datasource=npm depName=renovate
+          RENOVATE_VERSION: "44.65.0"
+        run: npx --yes --package "renovate@${RENOVATE_VERSION}" renovate-config-validator renovate/active.json
+
       - name: Test backend conformance runner
         run: node --test conformance/backend/run.test.mjs
 
