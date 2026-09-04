@@ -84,6 +84,12 @@ Each Active repository must provide one canonical local check matching its CI
 gate. Restores use the committed lockfile and production builds must be
 reproducible from a clean checkout.
 
+On managed workstations, agents must not install, remove, downgrade, or switch
+the host JDK. Java gates use the IT-approved patched JDK already present; when
+none is configured, use repository containers and CI. Containerized checks
+must record the resolved `java -version`, and any host JDK change requires
+explicit owner and IT approval.
+
 | Family                | Required local gate                                                              |
 | --------------------- | -------------------------------------------------------------------------------- |
 | Node.js application   | `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm build`                     |
