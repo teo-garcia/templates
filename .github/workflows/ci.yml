@@ -29,6 +29,9 @@ jobs:
           RENOVATE_VERSION: "44.65.0"
         run: npx --yes --package "renovate@${RENOVATE_VERSION}" renovate-config-validator renovate/active.json
 
+      - name: Check governance deadlines
+        run: node conformance/governance/check.mjs
+
       - name: Test backend conformance runner
         run: node --test conformance/backend/run.test.mjs
 
