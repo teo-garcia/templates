@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, constants, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 const immutableActionPattern = /uses:\s+[^\s@]+@[0-9a-f]{40}(?:\s+#\s+\S+)?$/gm;
@@ -62,6 +62,64 @@ export const assertSecurityWorkflow = (source) => {
   assert.doesNotMatch(source, /(packages|attestations|id-token):\s+write/);
 };
 
+const sharedWorkflowReference = (source, workflow, name) => {
+  const match = source.match(
+    new RegExp(
+      `uses:\\s+teo-garcia/templates/\\.github/workflows/${workflow}@([0-9a-f]{40})\\s+#\\s+\\S+`,
+    ),
+  );
+  assert.ok(match, `${name} must pin ${workflow} to a full commit SHA`);
+  return match[1];
+};
+
+export const assertPilotConsumer = ({
+  dockerSource,
+  securitySource,
+  name,
+  requiredDockerInput,
+  requiredLocalAudit,
+}) => {
+  const containerPin = sharedWorkflowReference(
+    dockerSource,
+    "reusable-container-verification.yml",
+    `${name} Docker workflow`,
+  );
+  const securityPin = sharedWorkflowReference(
+    securitySource,
+    "reusable-security.yml",
+    `${name} security workflow`,
+  );
+
+  assert.equal(
+    containerPin,
+    securityPin,
+    `${name} delivery workflows must use the same shared revision`,
+  );
+  assert.match(dockerSource, /permissions:\n\s{2}contents:\s+read/);
+  assert.doesNotMatch(dockerSource, /^\s{4}(runs-on|steps):/m);
+  assert.equal(
+    [...dockerSource.matchAll(/^\s{4}uses:/gm)].length,
+    1,
+    `${name} Docker workflow must remain a thin reusable-workflow caller`,
+  );
+  assert.doesNotMatch(
+    dockerSource,
+    /(packages|attestations|id-token):\s+write/,
+  );
+  assert.match(securitySource, /security-events:\s+write/);
+  assert.doesNotMatch(
+    securitySource,
+    /(packages|attestations|id-token):\s+write/,
+  );
+
+  if (requiredDockerInput) {
+    assert.match(dockerSource, requiredDockerInput);
+  }
+  if (requiredLocalAudit) {
+    assert.match(securitySource, requiredLocalAudit);
+  }
+};
+
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const containerSource = await readFile(
   `${root}/.github/workflows/reusable-container-verification.yml`,
@@ -75,4 +133,42 @@ const securitySource = await readFile(
 assertReadOnlyContainerWorkflow(containerSource);
 assertSecurityWorkflow(securitySource);
 
-console.log("Reusable delivery workflow contracts valid");
+const pilots = [
+  {
+    directory: "nest-template-monolith",
+    name: "Nest",
+    requiredLocalAudit: /pnpm audit --audit-level=high/,
+  },
+  {
+    directory: "fastapi-template-monolith",
+    name: "FastAPI",
+    requiredLocalAudit: /pip-audit/,
+  },
+  {
+    directory: "spring-template-monolith",
+    name: "Spring",
+  },
+  {
+    directory: "gin-template-monolith",
+    name: "Gin",
+    requiredDockerInput: /target:\s+production/,
+    requiredLocalAudit: /govulncheck \.\/\.\.\./,
+  },
+];
+
+for (const pilot of pilots) {
+  const pilotRoot = `${root}/${pilot.directory}`;
+  const [dockerSource, pilotSecuritySource] = await Promise.all([
+    readFile(`${pilotRoot}/.github/workflows/docker-build.yml`, "utf8"),
+    readFile(`${pilotRoot}/.github/workflows/security-scan.yml`, "utf8"),
+    access(`${pilotRoot}/.github/scripts/container-smoke.sh`, constants.X_OK),
+  ]);
+
+  assertPilotConsumer({
+    ...pilot,
+    dockerSource,
+    securitySource: pilotSecuritySource,
+  });
+}
+
+console.log("Reusable delivery workflow and pilot consumer contracts valid");

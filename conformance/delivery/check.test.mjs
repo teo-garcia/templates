@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import {
   assertImmutableActions,
+  assertPilotConsumer,
   assertReadOnlyContainerWorkflow,
   assertReusableOnly,
 } from "./check.mjs";
@@ -68,5 +69,52 @@ test("rejects image publication from verification", () => {
         containerFixture.replace("push: false", "push: true"),
       ),
     /push/,
+  );
+});
+
+const pilotFixture = {
+  name: "Example",
+  dockerSource: `permissions:
+  contents: read
+jobs:
+  verify:
+    uses: teo-garcia/templates/.github/workflows/reusable-container-verification.yml@9a0eba11237b3d7b03d58c4bb58c90c8771a2cf4 # delivery-v0.1.1
+`,
+  securitySource: `jobs:
+  shared-security:
+    permissions:
+      contents: read
+      security-events: write
+    uses: teo-garcia/templates/.github/workflows/reusable-security.yml@9a0eba11237b3d7b03d58c4bb58c90c8771a2cf4 # delivery-v0.1.1
+  ecosystem-audit:
+    run: audit dependencies
+`,
+  requiredLocalAudit: /audit dependencies/,
+};
+
+test("accepts an immutable thin pilot consumer", () => {
+  assert.doesNotThrow(() => assertPilotConsumer(pilotFixture));
+});
+
+test("rejects a mutable pilot workflow reference", () => {
+  assert.throws(
+    () =>
+      assertPilotConsumer({
+        ...pilotFixture,
+        dockerSource: pilotFixture.dockerSource.replace(/[0-9a-f]{40}/, "main"),
+      }),
+    /full commit SHA/,
+  );
+});
+
+test("rejects a pilot without its local ecosystem audit", () => {
+  assert.throws(() =>
+    assertPilotConsumer({
+      ...pilotFixture,
+      securitySource: pilotFixture.securitySource.replace(
+        "audit dependencies",
+        "echo skipped",
+      ),
+    }),
   );
 });
