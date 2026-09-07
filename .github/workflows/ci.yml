@@ -32,12 +32,15 @@ jobs:
       - name: Check governance deadlines
         run: node conformance/governance/check.mjs
 
-      - name: Checkout delivery pilot templates
+      - name: Checkout application delivery templates
         run: >-
           git -c 'url.https://github.com/.insteadOf=git@github.com:'
           submodule update --init nest-template-monolith
-          fastapi-template-monolith spring-template-monolith
-          gin-template-monolith
+          adonis-template-monolith fastapi-template-monolith
+          django-template-monolith spring-template-monolith
+          gin-template-monolith next-template-fullstack
+          react-router-template-fullstack tanstack-template-fullstack
+          astro-template-fullstack expo-template-mobile
 
       - name: Check reusable delivery workflows
         run: node --test conformance/delivery/check.test.mjs && node conformance/delivery/check.mjs

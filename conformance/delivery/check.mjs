@@ -105,22 +105,24 @@ export const assertPilotConsumer = ({
     "reusable-security.yml",
     `${name} security workflow`,
   );
-  const releaseVerificationPin = sharedWorkflowReference(
-    releaseSource,
-    "reusable-container-verification.yml",
-    `${name} release verification job`,
-  );
-  const releasePublicationPin = sharedWorkflowReference(
-    releaseSource,
-    "reusable-container-release.yml",
-    `${name} release publication job`,
-  );
+  const pins = [securityPin];
 
-  for (const pin of [
-    securityPin,
-    releaseVerificationPin,
-    releasePublicationPin,
-  ]) {
+  if (releaseSource) {
+    pins.push(
+      sharedWorkflowReference(
+        releaseSource,
+        "reusable-container-verification.yml",
+        `${name} release verification job`,
+      ),
+      sharedWorkflowReference(
+        releaseSource,
+        "reusable-container-release.yml",
+        `${name} release publication job`,
+      ),
+    );
+  }
+
+  for (const pin of pins) {
     assert.equal(
       containerPin,
       pin,
@@ -143,30 +145,34 @@ export const assertPilotConsumer = ({
     securitySource,
     /(packages|attestations|id-token):\s+write/,
   );
-  assert.match(releaseSource, /^on:\n\s{2}push:\n\s{4}tags:\s+\["v\*"\]/m);
-  assert.doesNotMatch(
-    releaseSource,
-    /^\s{2}(pull_request|schedule|workflow_dispatch):/m,
-  );
-  assert.doesNotMatch(releaseSource, /^\s{4}branches:/m);
-  assert.match(releaseSource, /publish:\n(?:.|\n)*?needs:\s+verify/);
-  for (const permission of ["packages", "id-token", "attestations"]) {
-    assert.equal(
-      [...releaseSource.matchAll(new RegExp(`${permission}:\\s+write`, "g"))]
-        .length,
-      1,
-      `${name} release workflow must grant ${permission}: write once`,
+  if (releaseSource) {
+    assert.match(releaseSource, /^on:\n\s{2}push:\n\s{4}tags:\s+\["v\*"\]/m);
+    assert.doesNotMatch(
+      releaseSource,
+      /^\s{2}(pull_request|schedule|workflow_dispatch):/m,
     );
+    assert.doesNotMatch(releaseSource, /^\s{4}branches:/m);
+    assert.match(releaseSource, /publish:\n(?:.|\n)*?needs:\s+verify/);
+    for (const permission of ["packages", "id-token", "attestations"]) {
+      assert.equal(
+        [...releaseSource.matchAll(new RegExp(`${permission}:\\s+write`, "g"))]
+          .length,
+        1,
+        `${name} release workflow must grant ${permission}: write once`,
+      );
+    }
   }
 
   if (requiredDockerInput) {
     assert.match(dockerSource, requiredDockerInput);
-    assert.equal(
-      (releaseSource.match(new RegExp(requiredDockerInput.source, "g")) ?? [])
-        .length,
-      2,
-      `${name} release verification and publication must retain the Docker target`,
-    );
+    if (releaseSource) {
+      assert.equal(
+        (releaseSource.match(new RegExp(requiredDockerInput.source, "g")) ?? [])
+          .length,
+        2,
+        `${name} release verification and publication must retain the Docker target`,
+      );
+    }
   }
   if (requiredLocalAudit) {
     assert.match(securitySource, requiredLocalAudit);
@@ -191,45 +197,90 @@ assertReadOnlyContainerWorkflow(containerSource);
 assertSecurityWorkflow(securitySource);
 assertReleaseWorkflow(releaseSource);
 
-const pilots = [
+const consumers = [
   {
     directory: "nest-template-monolith",
     name: "Nest",
+    release: true,
+    requiredLocalAudit: /pnpm audit --audit-level=high/,
+  },
+  {
+    directory: "adonis-template-monolith",
+    name: "Adonis",
+    release: true,
     requiredLocalAudit: /pnpm audit --audit-level=high/,
   },
   {
     directory: "fastapi-template-monolith",
     name: "FastAPI",
+    release: true,
+    requiredLocalAudit: /pip-audit/,
+  },
+  {
+    directory: "django-template-monolith",
+    name: "Django",
+    release: true,
     requiredLocalAudit: /pip-audit/,
   },
   {
     directory: "spring-template-monolith",
     name: "Spring",
+    release: true,
   },
   {
     directory: "gin-template-monolith",
     name: "Gin",
+    release: true,
     requiredDockerInput: /target:\s+production/,
     requiredLocalAudit: /govulncheck \.\/\.\.\./,
   },
+  ...[
+    ["next-template-fullstack", "Next"],
+    ["react-router-template-fullstack", "React Router"],
+    ["tanstack-template-fullstack", "TanStack"],
+    ["astro-template-fullstack", "Astro"],
+    ["expo-template-mobile", "Expo web"],
+  ].map(([directory, name]) => ({
+    directory,
+    name,
+    release: false,
+    requiredLocalAudit: /pnpm audit --audit-level=high/,
+  })),
 ];
 
-for (const pilot of pilots) {
-  const pilotRoot = `${root}/${pilot.directory}`;
+for (const consumer of consumers) {
+  const consumerRoot = `${root}/${consumer.directory}`;
   const [dockerSource, pilotSecuritySource, pilotReleaseSource] =
     await Promise.all([
-      readFile(`${pilotRoot}/.github/workflows/docker-build.yml`, "utf8"),
-      readFile(`${pilotRoot}/.github/workflows/security-scan.yml`, "utf8"),
-      readFile(`${pilotRoot}/.github/workflows/container-release.yml`, "utf8"),
-      access(`${pilotRoot}/.github/scripts/container-smoke.sh`, constants.X_OK),
+      readFile(`${consumerRoot}/.github/workflows/docker-build.yml`, "utf8"),
+      readFile(`${consumerRoot}/.github/workflows/security-scan.yml`, "utf8"),
+      readFile(
+        `${consumerRoot}/.github/workflows/container-release.yml`,
+        "utf8",
+      ).catch((error) => {
+        if (error.code === "ENOENT") return undefined;
+        throw error;
+      }),
+      access(
+        `${consumerRoot}/.github/scripts/container-smoke.sh`,
+        constants.X_OK,
+      ),
     ]);
 
+  assert.equal(
+    Boolean(pilotReleaseSource),
+    consumer.release,
+    `${consumer.name} release workflow must match its deployment contract`,
+  );
+
   assertPilotConsumer({
-    ...pilot,
+    ...consumer,
     dockerSource,
     securitySource: pilotSecuritySource,
     releaseSource: pilotReleaseSource,
   });
 }
 
-console.log("Reusable delivery workflow and pilot consumer contracts valid");
+console.log(
+  "Reusable delivery workflow and application consumer contracts valid",
+);

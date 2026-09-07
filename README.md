@@ -88,6 +88,11 @@ Release callers trigger only for `v*` tags, grant write permissions only to the
 release job, and use the same immutable portfolio revision for verification and
 publication. Rollback is an explicit change of that pinned revision.
 
+All Active backend monoliths use the verification, security, and release
+contracts. Web templates and Expo's static web container use verification and
+security only: their deployment remains provider-neutral, and Expo native
+releases remain outside the container workflow.
+
 ---
 
 ## Requirements

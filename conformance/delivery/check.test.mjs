@@ -159,6 +159,12 @@ test("accepts an immutable thin pilot consumer", () => {
   assert.doesNotThrow(() => assertPilotConsumer(pilotFixture));
 });
 
+test("accepts a verification-only application consumer", () => {
+  assert.doesNotThrow(() =>
+    assertPilotConsumer({ ...pilotFixture, releaseSource: undefined }),
+  );
+});
+
 test("rejects a mutable pilot workflow reference", () => {
   assert.throws(
     () =>
