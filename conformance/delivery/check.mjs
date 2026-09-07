@@ -53,6 +53,11 @@ export const assertSecurityWorkflow = (source) => {
   assertImmutableActions(source, "security workflow");
   assert.match(source, /security-events:\s+write/);
   assert.match(source, /severity:\s+HIGH,CRITICAL/g);
+  assert.equal(
+    [...source.matchAll(/limit-severities-for-sarif:\s+true/g)].length,
+    2,
+    "security workflow must enforce severity filtering for both SARIF scans",
+  );
   assert.match(source, /fail-on-severity:\s+high/);
   assert.doesNotMatch(source, /(packages|attestations|id-token):\s+write/);
 };

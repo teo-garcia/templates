@@ -35,6 +35,7 @@ jobs:
           format: sarif
           output: trivy-fs.sarif
           severity: HIGH,CRITICAL
+          limit-severities-for-sarif: true
           ignore-unfixed: ${{ inputs.ignore-unfixed }}
           exit-code: ${{ inputs.fail-on-findings && '1' || '0' }}
 
@@ -54,6 +55,7 @@ jobs:
           format: sarif
           output: trivy-dockerfile.sarif
           severity: HIGH,CRITICAL
+          limit-severities-for-sarif: true
           ignore-unfixed: ${{ inputs.ignore-unfixed }}
           exit-code: ${{ inputs.fail-on-findings && '1' || '0' }}
 
