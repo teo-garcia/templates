@@ -62,6 +62,21 @@ export const assertSecurityWorkflow = (source) => {
   assert.doesNotMatch(source, /(packages|attestations|id-token):\s+write/);
 };
 
+export const assertReleaseWorkflow = (source) => {
+  assertReusableOnly(source, "release workflow");
+  assertImmutableActions(source, "release workflow");
+  assert.match(source, /if:\s+startsWith\(github\.ref, 'refs\/tags\/v'\)/);
+  assert.match(source, /contents:\s+read/);
+  assert.match(source, /packages:\s+write/);
+  assert.match(source, /id-token:\s+write/);
+  assert.match(source, /attestations:\s+write/);
+  assert.match(source, /push:\s+true/);
+  assert.match(source, /provenance:\s+mode=max/);
+  assert.match(source, /sbom:\s+true/);
+  assert.match(source, /uses:\s+actions\/attest@[0-9a-f]{40}/);
+  assert.doesNotMatch(source, /pull_request:/);
+};
+
 const sharedWorkflowReference = (source, workflow, name) => {
   const match = source.match(
     new RegExp(
@@ -129,9 +144,14 @@ const securitySource = await readFile(
   `${root}/.github/workflows/reusable-security.yml`,
   "utf8",
 );
+const releaseSource = await readFile(
+  `${root}/.github/workflows/reusable-container-release.yml`,
+  "utf8",
+);
 
 assertReadOnlyContainerWorkflow(containerSource);
 assertSecurityWorkflow(securitySource);
+assertReleaseWorkflow(releaseSource);
 
 const pilots = [
   {

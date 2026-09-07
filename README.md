@@ -74,6 +74,8 @@ not vary by framework:
   Dockerfile and runs its executable `.github/scripts/container-smoke.sh`.
 - `reusable-security.yml` scans the caller's filesystem and Dockerfile and
   reviews dependency changes on pull requests.
+- `reusable-container-release.yml` publishes semver-tagged images to GHCR with
+  an SBOM and provenance only after the caller's verification job succeeds.
 
 Calling repositories keep their event and path filters, ecosystem dependency
 audit, and framework-specific smoke script. They must pin portfolio workflows
@@ -82,7 +84,9 @@ to that SHA; moving branch and tag references are not accepted.
 
 Container publication and provenance use a separate write-capable workflow so
 pull-request verification never receives registry or attestation permissions.
-That release path remains unfinished until the governance evidence is met.
+Release callers trigger only for `v*` tags, grant write permissions only to the
+release job, and use the same immutable portfolio revision for verification and
+publication. Rollback is an explicit change of that pinned revision.
 
 ---
 

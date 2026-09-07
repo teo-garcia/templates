@@ -5,6 +5,7 @@ import {
   assertImmutableActions,
   assertPilotConsumer,
   assertReadOnlyContainerWorkflow,
+  assertReleaseWorkflow,
   assertReusableOnly,
 } from "./check.mjs";
 
@@ -69,6 +70,51 @@ test("rejects image publication from verification", () => {
         containerFixture.replace("push: false", "push: true"),
       ),
     /push/,
+  );
+});
+
+const releaseFixture = `on:
+  workflow_call:
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+jobs:
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        with:
+          push: true
+          provenance: mode=max
+          sbom: true
+      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+`;
+
+test("accepts a tag-gated attested release workflow", () => {
+  assert.doesNotThrow(() => assertReleaseWorkflow(releaseFixture));
+});
+
+test("rejects a release workflow without tag gating", () => {
+  assert.throws(() =>
+    assertReleaseWorkflow(
+      releaseFixture.replace(
+        "if: startsWith(github.ref, 'refs/tags/v')",
+        "if: always()",
+      ),
+    ),
+  );
+});
+
+test("rejects an unattested release workflow", () => {
+  assert.throws(() =>
+    assertReleaseWorkflow(
+      releaseFixture.replace(
+        "      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4\n",
+        "",
+      ),
+    ),
   );
 });
 
