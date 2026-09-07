@@ -91,6 +91,13 @@ try {
 
   writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`)
   run('pnpm', ['install', '--no-frozen-lockfile'], consumer)
+  if (process.env.CI) {
+    run(
+      'pnpm',
+      ['exec', 'playwright', 'install', '--with-deps', 'chromium'],
+      consumer
+    )
+  }
   run('pnpm', ['check'], consumer)
 
   console.log('Node shared packages passed in next-template-fullstack')

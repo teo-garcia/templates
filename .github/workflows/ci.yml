@@ -61,6 +61,29 @@ jobs:
 
   shared-python-consumer:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: fastapi_monolith_test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - uses: actions/checkout@v6
 
@@ -78,6 +101,10 @@ jobs:
 
       - name: Check Python wheels in FastAPI
         run: python conformance/shared-packages/python.py
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/fastapi_monolith_test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
 
   shared-go-consumer:
     runs-on: ubuntu-latest
