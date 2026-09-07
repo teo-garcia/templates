@@ -135,6 +135,23 @@ jobs:
   ecosystem-audit:
     run: audit dependencies
 `,
+  releaseSource: `on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+jobs:
+  verify:
+    uses: teo-garcia/templates/.github/workflows/reusable-container-verification.yml@9a0eba11237b3d7b03d58c4bb58c90c8771a2cf4 # delivery-v0.1.1
+  publish:
+    needs: verify
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    uses: teo-garcia/templates/.github/workflows/reusable-container-release.yml@9a0eba11237b3d7b03d58c4bb58c90c8771a2cf4 # delivery-v0.1.1
+`,
   requiredLocalAudit: /audit dependencies/,
 };
 
@@ -162,5 +179,31 @@ test("rejects a pilot without its local ecosystem audit", () => {
         "echo skipped",
       ),
     }),
+  );
+});
+
+test("rejects a release caller that bypasses verification", () => {
+  assert.throws(() =>
+    assertPilotConsumer({
+      ...pilotFixture,
+      releaseSource: pilotFixture.releaseSource.replace(
+        "needs: verify",
+        "needs: []",
+      ),
+    }),
+  );
+});
+
+test("rejects a release caller with a mismatched policy revision", () => {
+  assert.throws(
+    () =>
+      assertPilotConsumer({
+        ...pilotFixture,
+        releaseSource: pilotFixture.releaseSource.replace(
+          "9a0eba11237b3d7b03d58c4bb58c90c8771a2cf4 # delivery-v0.1.1",
+          "e0aa52f1d25edeac907bf1dcf2243af4d958e5e0 # delivery-v0.2.0",
+        ),
+      }),
+    /same shared revision/,
   );
 });

@@ -90,6 +90,7 @@ const sharedWorkflowReference = (source, workflow, name) => {
 export const assertPilotConsumer = ({
   dockerSource,
   securitySource,
+  releaseSource,
   name,
   requiredDockerInput,
   requiredLocalAudit,
@@ -104,12 +105,28 @@ export const assertPilotConsumer = ({
     "reusable-security.yml",
     `${name} security workflow`,
   );
-
-  assert.equal(
-    containerPin,
-    securityPin,
-    `${name} delivery workflows must use the same shared revision`,
+  const releaseVerificationPin = sharedWorkflowReference(
+    releaseSource,
+    "reusable-container-verification.yml",
+    `${name} release verification job`,
   );
+  const releasePublicationPin = sharedWorkflowReference(
+    releaseSource,
+    "reusable-container-release.yml",
+    `${name} release publication job`,
+  );
+
+  for (const pin of [
+    securityPin,
+    releaseVerificationPin,
+    releasePublicationPin,
+  ]) {
+    assert.equal(
+      containerPin,
+      pin,
+      `${name} delivery workflows must use the same shared revision`,
+    );
+  }
   assert.match(dockerSource, /permissions:\n\s{2}contents:\s+read/);
   assert.doesNotMatch(dockerSource, /^\s{4}(runs-on|steps):/m);
   assert.equal(
@@ -126,9 +143,30 @@ export const assertPilotConsumer = ({
     securitySource,
     /(packages|attestations|id-token):\s+write/,
   );
+  assert.match(releaseSource, /^on:\n\s{2}push:\n\s{4}tags:\s+\["v\*"\]/m);
+  assert.doesNotMatch(
+    releaseSource,
+    /^\s{2}(pull_request|schedule|workflow_dispatch):/m,
+  );
+  assert.doesNotMatch(releaseSource, /^\s{4}branches:/m);
+  assert.match(releaseSource, /publish:\n(?:.|\n)*?needs:\s+verify/);
+  for (const permission of ["packages", "id-token", "attestations"]) {
+    assert.equal(
+      [...releaseSource.matchAll(new RegExp(`${permission}:\\s+write`, "g"))]
+        .length,
+      1,
+      `${name} release workflow must grant ${permission}: write once`,
+    );
+  }
 
   if (requiredDockerInput) {
     assert.match(dockerSource, requiredDockerInput);
+    assert.equal(
+      (releaseSource.match(new RegExp(requiredDockerInput.source, "g")) ?? [])
+        .length,
+      2,
+      `${name} release verification and publication must retain the Docker target`,
+    );
   }
   if (requiredLocalAudit) {
     assert.match(securitySource, requiredLocalAudit);
@@ -178,16 +216,19 @@ const pilots = [
 
 for (const pilot of pilots) {
   const pilotRoot = `${root}/${pilot.directory}`;
-  const [dockerSource, pilotSecuritySource] = await Promise.all([
-    readFile(`${pilotRoot}/.github/workflows/docker-build.yml`, "utf8"),
-    readFile(`${pilotRoot}/.github/workflows/security-scan.yml`, "utf8"),
-    access(`${pilotRoot}/.github/scripts/container-smoke.sh`, constants.X_OK),
-  ]);
+  const [dockerSource, pilotSecuritySource, pilotReleaseSource] =
+    await Promise.all([
+      readFile(`${pilotRoot}/.github/workflows/docker-build.yml`, "utf8"),
+      readFile(`${pilotRoot}/.github/workflows/security-scan.yml`, "utf8"),
+      readFile(`${pilotRoot}/.github/workflows/container-release.yml`, "utf8"),
+      access(`${pilotRoot}/.github/scripts/container-smoke.sh`, constants.X_OK),
+    ]);
 
   assertPilotConsumer({
     ...pilot,
     dockerSource,
     securitySource: pilotSecuritySource,
+    releaseSource: pilotReleaseSource,
   });
 }
 

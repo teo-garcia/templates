@@ -33,7 +33,11 @@ jobs:
         run: node conformance/governance/check.mjs
 
       - name: Checkout delivery pilot templates
-        run: git submodule update --init nest-template-monolith fastapi-template-monolith spring-template-monolith gin-template-monolith
+        run: >-
+          git -c 'url.https://github.com/.insteadOf=git@github.com:'
+          submodule update --init nest-template-monolith
+          fastapi-template-monolith spring-template-monolith
+          gin-template-monolith
 
       - name: Check reusable delivery workflows
         run: node --test conformance/delivery/check.test.mjs && node conformance/delivery/check.mjs
