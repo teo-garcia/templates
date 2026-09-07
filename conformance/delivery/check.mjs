@@ -238,6 +238,13 @@ const consumers = [
     ["next-template-fullstack", "Next"],
     ["react-router-template-fullstack", "React Router"],
     ["tanstack-template-fullstack", "TanStack"],
+  ].map(([directory, name]) => ({
+    directory,
+    name,
+    release: true,
+    requiredLocalAudit: /pnpm audit --audit-level=high/,
+  })),
+  ...[
     ["astro-template-fullstack", "Astro"],
     ["expo-template-mobile", "Expo web"],
   ].map(([directory, name]) => ({

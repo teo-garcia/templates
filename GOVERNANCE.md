@@ -167,6 +167,15 @@ resources and expected cost, passes the application smoke, and proves teardown.
 Offline plans, mocked tests, and local emulation are valuable evidence but must
 never be described as a live deployment.
 
+The checked offline baseline now lives in `terraform-template-baseline`: its
+default plan creates zero resources, its catalog covers all 11 Active
+applications, and mocked plan-only tests exercise every consumer. The three
+server-rendered web templates publish immutable images only on explicit `v*`
+tags, while Astro and Expo web retain versioned static artifacts. Spring exposes
+a finite same-image Flyway runner. This completes the credential-free authoring
+slice; the Active work item remains open because no owner-authorized live AWS
+matrix, cost record, rollback proof, or teardown proof exists yet.
+
 ### Web templates
 
 | Surface      | Contract                                                                                              |

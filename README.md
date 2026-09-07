@@ -88,10 +88,24 @@ Release callers trigger only for `v*` tags, grant write permissions only to the
 release job, and use the same immutable portfolio revision for verification and
 publication. Rollback is an explicit change of that pinned revision.
 
-All Active backend monoliths use the verification, security, and release
-contracts. Web templates and Expo's static web container use verification and
-security only: their deployment remains provider-neutral, and Expo native
-releases remain outside the container workflow.
+All Active backend monoliths and the three server-rendered web templates use
+the verification, security, and release contracts. Astro and Expo web use
+verification and security only because their canonical AWS artifact is the
+static `dist/` output. Expo native releases remain outside the container
+workflow.
+
+### AWS distribution baseline
+
+[`terraform-template-baseline`](terraform-template-baseline) contains the
+OpenTofu-compatible AWS reference for all 11 Active applications: nine
+container-service consumers use ECS/Fargate, and Astro plus Expo web use private
+S3/CloudFront static delivery. Its default plan creates zero AWS resources, its
+consumer matrix is tested with a mocked provider, and the repository contains no
+AWS credentials, remote state, or automated apply.
+
+The baseline remains Incubating and must not be described as live distribution
+until the owner-authorized, cost-bounded AWS matrix in
+[`GOVERNANCE.md`](GOVERNANCE.md) is exercised and torn down successfully.
 
 ---
 
