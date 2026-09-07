@@ -39,6 +39,32 @@ Maintained by [@teo-garcia](https://github.com/teo-garcia)
 | Go            | [`golangci-config-shared`](golangci-config-shared), [`gotest-config-shared`](gotest-config-shared)                                                                                       |
 | Observability | [`observability-template-stack`](observability-template-stack)                                                                                                                           |
 
+### Compatibility and release consumers
+
+Shared package releases are checked as built artifacts inside representative
+Active templates. The package repositories still own their complete synthetic
+preset matrices; these consumers prove that the packages also compose in real
+applications.
+
+| Package                  | Supported baseline                                               | Release consumer            |
+| ------------------------ | ---------------------------------------------------------------- | --------------------------- |
+| `eslint-config-shared`   | Node 24+, ESLint 10, and the peer ranges declared by the package | `next-template-fullstack`   |
+| `prettier-config-shared` | Node 24+ and Prettier 3                                          | `next-template-fullstack`   |
+| `tsconfig-shared`        | Node 24+; preset-specific framework and TypeScript requirements  | `next-template-fullstack`   |
+| `vitest-config-shared`   | Node 24+, Vitest 4, and Vite/React peers declared by the package | `next-template-fullstack`   |
+| `ruff-config-shared`     | Python 3.12+ and Ruff 0.8+                                       | `fastapi-template-monolith` |
+| `mypy-config-shared`     | Python 3.12+ and mypy 1.14+                                      | `fastapi-template-monolith` |
+| `pytest-config-shared`   | Python 3.12+, pytest 8.3+, and pytest-cov 6+                     | `fastapi-template-monolith` |
+| `golangci-config-shared` | Go 1.25.13+ and golangci-lint 2.12+                              | `gin-template-monolith`     |
+| `gotest-config-shared`   | Go 1.25.13+                                                      | `gin-template-monolith`     |
+
+Before a package is tagged, update its submodule pointer here and require this
+repository's shared-consumer jobs to pass. Node tarballs and Python wheels are
+installed into temporary consumer copies; Go consumers use temporary module
+replacements. Package release workflows separately verify packed contents and
+require a `v<package version>` tag. Go modules require a Go-compatible `v0.x.y`
+or `v1.x.y` tag.
+
 ---
 
 ## Requirements

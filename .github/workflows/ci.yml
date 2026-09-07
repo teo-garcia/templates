@@ -37,3 +37,68 @@ jobs:
 
       - name: Check web conformance runner
         run: node --check conformance/web/run.mjs
+
+  shared-node-consumer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Checkout shared packages and consumer
+        run: git submodule update --init eslint-config-shared prettier-config-shared tsconfig-shared vitest-config-shared next-template-fullstack
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.25.0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: next-template-fullstack/pnpm-lock.yaml
+
+      - name: Check packed Node packages in Next.js
+        run: node conformance/shared-packages/node.mjs
+
+  shared-python-consumer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Checkout shared packages and consumer
+        run: git submodule update --init ruff-config-shared mypy-config-shared pytest-config-shared fastapi-template-monolith
+
+      - uses: astral-sh/setup-uv@v8.3.2
+        with:
+          enable-cache: true
+          cache-dependency-glob: fastapi-template-monolith/uv.lock
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Check Python wheels in FastAPI
+        run: python conformance/shared-packages/python.py
+
+  shared-go-consumer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Use HTTPS for Go submodules
+        run: >-
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+
+      - name: Checkout shared packages and consumer
+        run: git submodule update --init golangci-config-shared gotest-config-shared gin-template-monolith
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: gin-template-monolith/go.mod
+          cache-dependency-path: gin-template-monolith/go.sum
+
+      - name: Check Go modules in Gin
+        run: node conformance/shared-packages/go.mjs

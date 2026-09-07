@@ -241,12 +241,10 @@ active work or requires a governance decision before it is accepted.
 
 Only unfinished work appears here. At most three items may be `Now`. When an
 item meets its evidence requirement, remove it; do not retain a completed row.
-Resume work from the first row in this table that has not met its evidence
-requirement; rows are deliberately ordered so no separate roadmap is needed.
+Resume work from the first listed item; items are deliberately ordered so no
+separate roadmap is needed.
 
-| Status | Priority | Scope                                               | Outcome required                                                                                                                                | Evidence required                                                                                                                                                                     |
-| ------ | -------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Now    | P1       | Shared packages                                     | Verify real consumers and release artifacts.                                                                                                    | Consumer matrix, packed/wheel contents, tag/version agreement, and documented compatibility.                                                                                          |
+There is no unfinished portfolio work.
 
 ## Change protocol
 
