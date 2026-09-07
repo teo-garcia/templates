@@ -160,6 +160,19 @@ visual reference, but matching its internal file structure is not required.
 Framework implementations may differ, but the public HTTP and operational
 surface must match.
 
+PostgreSQL and an ecosystem-native ORM are the persistence baseline. Schema
+migrations remain explicit deployment steps owned by dedicated migration tools;
+ORM startup must not mutate production schemas.
+
+| Repository                  | ORM                       | Migration tool |
+| --------------------------- | ------------------------- | -------------- |
+| `nest-template-monolith`    | Prisma                    | Prisma Migrate |
+| `adonis-template-monolith`  | Lucid                     | Lucid          |
+| `fastapi-template-monolith` | SQLAlchemy                | Alembic        |
+| `django-template-monolith`  | Django ORM                | Django         |
+| `spring-template-monolith`  | Spring Data JPA/Hibernate | Flyway         |
+| `gin-template-monolith`     | GORM                      | golang-migrate |
+
 | Surface       | Contract                                                                                                                                     |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | API           | Versioned REST routes live under `/api/v1`.                                                                                                  |
