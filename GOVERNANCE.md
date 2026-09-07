@@ -130,6 +130,43 @@ Portfolio verification must additionally prove:
 - Dependency and action updates are reviewed through Renovate under the policy
   below.
 
+### AWS distribution
+
+AWS is the portfolio's single cloud reference. This decision does not prevent a
+consumer from choosing another host, but the portfolio does not maintain a
+cross-cloud abstraction or claim parity with other providers.
+
+Every Active application must have a checked distribution path that consumes
+its canonical build artifact without changing framework internals:
+
+| Profile             | Active consumers                                                                                                                     | Required contract                                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Container service   | All six backend monoliths plus `next-template-fullstack`, `react-router-template-fullstack`, and `tanstack-template-fullstack`       | Immutable OCI image, explicit port and health path, environment and secret boundaries, dependency wiring, migration step, and rollback. |
+| Static web          | `astro-template-fullstack` and the Expo web export                                                                                    | Versioned static artifact, routing and TLS boundary, cache behavior, configuration injection, health smoke, and atomic rollback.        |
+| Native mobile       | Expo iOS and Android                                                                                                                  | Remains owned by Expo-native tooling; AWS distribution work must not claim, publish, or replace native releases.                         |
+
+PostgreSQL and Redis are attached only where the application contract requires
+them. Application repositories provide values and smoke fixtures; infrastructure
+owns AWS resources, networking, state boundaries, secrets integration, routing,
+and teardown. Kubernetes resources are excluded from this profile and governed
+separately below.
+
+All required authoring, validation, security scanning, testing, and learning
+workflows must run locally with open-source tooling and without cloud
+credentials. Repository gates must not contact AWS, run `apply`, create remote
+state, or require a paid SaaS product. A cost-bearing AWS component may be
+documented only as an explicit production alternative; it is not part of the
+default implementation when no generally available no-cost path exists.
+Infrastructure configuration must retain an OpenTofu-compatible execution path;
+HCP Terraform, Terraform Cloud, and other hosted control planes are optional and
+must not be required.
+
+A live AWS deployment is claimed only after an owner-authorized disposable run
+fits within an account's currently available no-cost allowance, records the
+resources and expected cost, passes the application smoke, and proves teardown.
+Offline plans, mocked tests, and local emulation are valuable evidence but must
+never be described as a live deployment.
+
 ### Web templates
 
 | Surface      | Contract                                                                                              |
@@ -203,6 +240,17 @@ ORM startup must not mutate production schemas.
 - Backend metrics, logs, and traces use stable names and bounded-cardinality
   labels that allow one shared dashboard model.
 - Template-specific instrumentation remains in the consuming application.
+- The required production profile is open-source-first: OpenTelemetry,
+  Prometheus-compatible metrics, Loki-compatible logs, Tempo-compatible traces,
+  Grafana dashboards, and Alertmanager-compatible routing must work without a
+  mandatory hosted observability vendor.
+- Cheap operation is an explicit contract, not an assumption. Default retention,
+  trace sampling, label cardinality, resource limits, storage growth, and alert
+  volume are bounded and documented; a cost estimate and its assumptions are
+  reviewed before any live deployment.
+- A compact single-node or local profile is the default learning and small-load
+  path. High availability, managed storage, and hosted integrations are optional
+  production alternatives and must not be required by repository checks.
 
 ## Approved exceptions
 
@@ -246,9 +294,9 @@ separate roadmap is needed.
 
 | Status | Priority | Scope                          | Outcome required                                                                                                                                                                     | Evidence required                                                                                                                                                                                                                              |
 | ------ | -------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Now    | P1       | Single-provider infrastructure | Turn `terraform-template-baseline` into one deployable vertical slice for one Active backend and one explicitly selected cloud provider; do not introduce a cross-cloud abstraction. | Formatting, validation, security scanning, and a clean plan pass in CI; a credentialed deployment proves networking, managed PostgreSQL and Redis, secrets, routing/TLS, explicit migrations, application health, and teardown.                |
-| Next   | P1       | Production operations          | Extend the existing observability contract from local debugging to a deployment-owned production profile with measurable reliability and actionable response paths.                  | The deployed reference service exports durable metrics, logs, and traces; an availability/latency SLO, alert routing, access controls, retention boundary, and tested operator runbook are documented and exercised by a failure drill.        |
-| Next   | P2       | Kubernetes delivery            | Activate `helm-template-baseline` only against a real Kubernetes target, keeping application delivery separate from cluster provisioning and exposing native Kubernetes controls.    | Chart linting, schema validation, render tests, and a disposable-cluster smoke prove health probes, configuration and secret wiring, resources, autoscaling, disruption handling, ingress/TLS, migration execution, and rollback.              |
+| Now    | P1       | AWS application distribution   | Turn `terraform-template-baseline` into the AWS reference for every Active application through explicit container-service and static-web profiles; preserve framework-native artifacts, keep native Expo releases separate, and introduce no cross-cloud or paid-only abstraction. | Formatting, validation, linting, security scanning, mocked tests, and deterministic plans pass without credentials for every consumer fixture; an owner-authorized disposable AWS matrix that fits the account's current no-cost allowance proves each app's routing, TLS boundary, secrets, PostgreSQL/Redis wiring where required, migrations, health, rollback, and teardown before live distribution is claimed. |
+| Next   | P1       | Production operations          | Extend the observability contract into a deployment-owned, open-source-first production profile with measurable reliability, bounded resource usage, and no mandatory hosted vendor. | Container runtimes export durable metrics, logs, and traces; static distributions expose availability, delivery, and access signals; each profile has an availability/latency SLO, Alertmanager-compatible routing, access controls, retention and sampling limits, cardinality/resource budgets, cost assumptions, and an operator runbook exercised by a failure drill. |
+| Next   | P2       | Kubernetes delivery            | Activate `helm-template-baseline` as a separate delivery layer for every container-service consumer, reusing immutable application images and keeping cluster provisioning, static sites, and Expo native releases out of the chart contract. | Chart linting, schema validation, render tests for every consumer, and a disposable local cluster smoke prove probes, configuration and secret wiring, resources, autoscaling, disruption handling, ingress/TLS, migration execution, observability attachment, rollback, and teardown without requiring a paid cluster. |
 | Next   | P1       | Microservices resumption       | Resume only the existing NestJS and FastAPI services as a bounded reliability slice; do not add framework variants or business-demo breadth.                                         | Governance pause is explicitly lifted for the slice; deployed NATS interoperability proves transactional publication, idempotent consumption, versioned events, retry, dead-letter and replay behavior, trace propagation, SLOs, and rollback. |
 | Next   | P2       | AI reference application       | Build an opt-in reference application from existing templates without adding volatile provider or model dependencies to baseline templates.                                          | One bounded use case proves provider isolation, structured output validation, evaluation fixtures, cost and latency telemetry, secret handling, failure behavior, and a deterministic non-network test path.                                   |
 
