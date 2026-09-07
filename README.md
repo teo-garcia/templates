@@ -65,6 +65,25 @@ replacements. Package release workflows separately verify packed contents and
 require a `v<package version>` tag. Go modules require a Go-compatible `v0.x.y`
 or `v1.x.y` tag.
 
+### Reusable delivery automation
+
+The portfolio owns reusable GitHub Actions workflows for behavior that should
+not vary by framework:
+
+- `reusable-container-verification.yml` builds the caller's production
+  Dockerfile and runs its executable `.github/scripts/container-smoke.sh`.
+- `reusable-security.yml` scans the caller's filesystem and Dockerfile and
+  reviews dependency changes on pull requests.
+
+Calling repositories keep their event and path filters, ecosystem dependency
+audit, and framework-specific smoke script. They must pin portfolio workflows
+to a full commit SHA. Updating or rolling back the policy is an explicit change
+to that SHA; moving branch and tag references are not accepted.
+
+Container publication and provenance use a separate write-capable workflow so
+pull-request verification never receives registry or attestation permissions.
+That release path remains unfinished until the governance evidence is met.
+
 ---
 
 ## Requirements

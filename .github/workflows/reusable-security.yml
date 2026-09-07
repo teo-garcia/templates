@@ -1,0 +1,82 @@
+name: Reusable Security
+
+on:
+  workflow_call:
+    inputs:
+      fail-on-findings:
+        description: Fail when Trivy finds a fixed high or critical issue
+        required: false
+        type: boolean
+        default: false
+      ignore-unfixed:
+        description: Ignore findings without an available fix
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  trivy:
+    name: Trivy filesystem and Dockerfile
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Check out caller repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Scan filesystem
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-fs.sarif
+          severity: HIGH,CRITICAL
+          ignore-unfixed: ${{ inputs.ignore-unfixed }}
+          exit-code: ${{ inputs.fail-on-findings && '1' || '0' }}
+
+      - name: Upload filesystem findings
+        if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
+        with:
+          sarif_file: trivy-fs.sarif
+          category: trivy-fs
+
+      - name: Scan Dockerfile configuration
+        if: always()
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: config
+          scan-ref: docker/Dockerfile
+          format: sarif
+          output: trivy-dockerfile.sarif
+          severity: HIGH,CRITICAL
+          ignore-unfixed: ${{ inputs.ignore-unfixed }}
+          exit-code: ${{ inputs.fail-on-findings && '1' || '0' }}
+
+      - name: Upload Dockerfile findings
+        if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
+        with:
+          sarif_file: trivy-dockerfile.sarif
+          category: trivy-dockerfile
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out caller repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high

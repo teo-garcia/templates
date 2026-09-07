@@ -32,6 +32,9 @@ jobs:
       - name: Check governance deadlines
         run: node conformance/governance/check.mjs
 
+      - name: Check reusable delivery workflows
+        run: node --test conformance/delivery/check.test.mjs && node conformance/delivery/check.mjs
+
       - name: Test backend conformance runner
         run: node --test conformance/backend/run.test.mjs
 

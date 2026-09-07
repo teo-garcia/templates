@@ -68,11 +68,11 @@ gate.
 
 ### Other lifecycle states
 
-| Lifecycle  | Repositories or directions                                                                          |
-| ---------- | --------------------------------------------------------------------------------------------------- |
-| Planned    | `angular-template-fullstack`, `click-template-layered`, `commander-template-layered`                |
-| Incubating | `terraform-template-baseline`, `helm-template-baseline`                                             |
-| Archived   | `archived/react-shared`, `archived/react-native-shared`, `archived/ts-core`, `archived/python-core` |
+| Lifecycle  | Repositories or directions                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------------------ |
+| Planned    | `angular-template-fullstack`, `click-template-layered`, `commander-template-layered`, AI/LLM reference application |
+| Incubating | `terraform-template-baseline`, `helm-template-baseline`                                                            |
+| Archived   | `archived/react-shared`, `archived/react-native-shared`, `archived/ts-core`, `archived/python-core`                |
 
 Do not promote a planned or incubating repository to Active until it has an
 independent remote, a reproducible verification command, a documented
@@ -244,7 +244,14 @@ item meets its evidence requirement, remove it; do not retain a completed row.
 Resume work from the first listed item; items are deliberately ordered so no
 separate roadmap is needed.
 
-There is no unfinished portfolio work.
+| Status | Priority | Scope                          | Outcome required                                                                                                                                                                     | Evidence required                                                                                                                                                                                                                              |
+| ------ | -------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Now    | P1       | Reusable delivery workflows    | Move repeated container build, security, provenance, and release policy into versioned reusable workflows owned by this portfolio without centralizing framework-native checks.      | A representative Node.js, Python, Java, and Go backend consumes pinned reusable workflows; repository-local canonical checks remain unchanged; change detection and rollback behavior are verified.                                            |
+| Next   | P1       | Single-provider infrastructure | Turn `terraform-template-baseline` into one deployable vertical slice for one Active backend and one explicitly selected cloud provider; do not introduce a cross-cloud abstraction. | Formatting, validation, security scanning, and a clean plan pass in CI; a credentialed deployment proves networking, managed PostgreSQL and Redis, secrets, routing/TLS, explicit migrations, application health, and teardown.                |
+| Next   | P1       | Production operations          | Extend the existing observability contract from local debugging to a deployment-owned production profile with measurable reliability and actionable response paths.                  | The deployed reference service exports durable metrics, logs, and traces; an availability/latency SLO, alert routing, access controls, retention boundary, and tested operator runbook are documented and exercised by a failure drill.        |
+| Next   | P2       | Kubernetes delivery            | Activate `helm-template-baseline` only against a real Kubernetes target, keeping application delivery separate from cluster provisioning and exposing native Kubernetes controls.    | Chart linting, schema validation, render tests, and a disposable-cluster smoke prove health probes, configuration and secret wiring, resources, autoscaling, disruption handling, ingress/TLS, migration execution, and rollback.              |
+| Next   | P1       | Microservices resumption       | Resume only the existing NestJS and FastAPI services as a bounded reliability slice; do not add framework variants or business-demo breadth.                                         | Governance pause is explicitly lifted for the slice; deployed NATS interoperability proves transactional publication, idempotent consumption, versioned events, retry, dead-letter and replay behavior, trace propagation, SLOs, and rollback. |
+| Next   | P2       | AI reference application       | Build an opt-in reference application from existing templates without adding volatile provider or model dependencies to baseline templates.                                          | One bounded use case proves provider isolation, structured output validation, evaluation fixtures, cost and latency telemetry, secret handling, failure behavior, and a deterministic non-network test path.                                   |
 
 ## Change protocol
 
