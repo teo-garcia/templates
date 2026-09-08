@@ -107,6 +107,22 @@ The baseline remains Incubating and must not be described as live distribution
 until the owner-authorized, cost-bounded AWS matrix in
 [`GOVERNANCE.md`](GOVERNANCE.md) is exercised and torn down successfully.
 
+### Production operations baseline
+
+[`observability-template-stack`](observability-template-stack) now provides two
+explicit paths: the anonymous local learning stack and a compact operations
+profile with password-protected Grafana on a loopback-only host surface. The
+latter adds durable bounded Prometheus, Loki, Tempo, Grafana, and Alertmanager
+storage; collector-side trace sampling; static HTTP/TLS probes; formal
+container/static SLO rules; generated reliability dashboards; resource limits;
+and an executable failure drill.
+
+The profile is entirely open-source and runs locally without cloud credentials
+or a hosted vendor. It is a single-node small-load baseline, not high
+availability. Application target enrollment, real CDN access logs, notification
+receivers, backups, and live cost review remain deployment-owned and are tracked
+in [`GOVERNANCE.md`](GOVERNANCE.md).
+
 ---
 
 ## Requirements
