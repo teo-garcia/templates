@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import {
@@ -7,7 +8,70 @@ import {
   assertReadOnlyContainerWorkflow,
   assertReleaseWorkflow,
   assertReusableOnly,
+  assertSecurityConsumer,
+  assertSecurityWorkflow,
 } from "./check.mjs";
+
+test("rejects advisory-only defaults even when ignore-unfixed defaults true", () => {
+  const source = readFileSync(
+    new URL("../../.github/workflows/reusable-security.yml", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotThrow(() => assertSecurityWorkflow(source));
+  assert.throws(() =>
+    assertSecurityWorkflow(source.replace("default: true", "default: false")),
+  );
+});
+
+const securityFixture = `on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  shared-security:
+    with:
+      fail-on-findings: true
+  security:
+    name: Security
+    if: always()
+    needs: [shared-security, npm-audit]
+    steps:
+      - env:
+          SHARED_SECURITY_RESULT: \${{ needs.shared-security.result }}
+          AUDIT_RESULT: \${{ needs.npm-audit.result }}
+        run: |
+          test "$SHARED_SECURITY_RESULT" = success
+          test "$AUDIT_RESULT" = success
+`;
+
+test("requires scans on every PR and propagates both scanner failures", () => {
+  assert.doesNotThrow(() =>
+    assertSecurityConsumer(securityFixture, "fixture", "npm-audit"),
+  );
+  for (const source of [
+    securityFixture.replace(
+      "fail-on-findings: true",
+      "fail-on-findings: false",
+    ),
+    securityFixture.replace(
+      "  pull_request:\n",
+      "  pull_request:\n    paths: [package.json]\n",
+    ),
+    securityFixture.replace("if: always()", "if: success()"),
+    securityFixture.replace(
+      "needs: [shared-security, npm-audit]",
+      "needs: [shared-security]",
+    ),
+    securityFixture.replace('test "$AUDIT_RESULT" = success', "echo skipped"),
+    securityFixture.replace(
+      'test "$SHARED_SECURITY_RESULT" = success',
+      "echo skipped",
+    ),
+  ]) {
+    assert.throws(() => assertSecurityConsumer(source, "fixture", "npm-audit"));
+  }
+});
 
 const containerFixture = `on:
   workflow_call:
