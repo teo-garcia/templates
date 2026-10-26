@@ -115,6 +115,26 @@ Portfolio verification must additionally prove:
   release;
 - repository lifecycle, GitHub settings, and dependency automation agree.
 
+### Security enforcement
+
+Every Active application runs security checks on every pull request and push
+to `main`, as well as a weekly scheduled scan. The stable `Security` check
+requires both the shared scanner policy and the ecosystem dependency audit
+where one exists. High and critical Trivy findings with an available fix fail
+the scan; dependency review rejects high and critical newly introduced
+vulnerabilities. Security workflows must not use path filters because their
+required merge check must run for every pull request.
+
+GitHub must require the application's canonical CI check and `Security` before
+merging into `main`. Dependency graph must be enabled for dependency review.
+Accepted risks name the affected dependency and advisory, explain the reviewed
+exposure, and have an explicit expiry. The portfolio checks these deadlines
+daily even when there are no code changes.
+
+Gin's application runtime uses Go 1.26.10 or newer to include the standard
+library security fixes required by its vulnerability scan. Shared Go tooling
+retains its existing minimum consumer version.
+
 ## Observable contracts
 
 ### All application templates
@@ -280,10 +300,6 @@ recorded.
 | `gin-template-monolith`     | Serves a self-contained OpenAPI page rather than a bundled Swagger UI dependency.       | Avoids an external runtime asset while preserving `/docs` and `/openapi.json`.                                                  |
 | `fastapi-template-monolith` | May additionally expose `/redoc`.                                                       | It does not replace the canonical documentation paths.                                                                          |
 | `expo-template-mobile`      | Has no manual theme switch.                                                             | Native behavior follows the operating-system color scheme.                                                                      |
-| `expo-template-mobile` / `diff@7.0.0` | Accept GHSA-73rr-hh4g-fpgx through `2026-10-05`. | Pinned `eas-cli@23.2.0` runs through `pnpm dlx` and calls `diffLines`; the advisory affects `parsePatch` and `applyPatch`. The CLI is not installed or bundled. Review on any EAS update or by the deadline. |
-| `expo-template-mobile` / `uuid@8.3.2`, `11.1.1` | Accept GHSA-w5hq-g745-h8pq and its duplicate through `2026-10-05`. | Pinned `eas-cli@23.2.0` runs through `pnpm dlx`; EAS and its Rudder SDK use v4 generation plus validation helpers, not the vulnerable v3/v5/v6 caller-buffer path. The CLI is not installed or bundled. Review on any EAS update or by the deadline. |
-| `expo-template-mobile` / `ts-deepmerge@6.2.0` | Accept GHSA-87mf-gv2c-c62c through `2026-10-05`. | Pinned `eas-cli@23.2.0` runs through `pnpm dlx`; this dependency is used only by the `eas new` project generator and is absent from application runtime. Review on any EAS update or by the deadline. |
-| `expo-template-mobile` / `decode-uri-component@0.2.2` | Accept GHSA-vcc3-ghjq-m6fr through `2026-10-05`. | Expo Router pins `query-string@7.1.3` but only calls `stringify`; the vulnerable decoder is not invoked. Forcing `0.5.0` breaks the parent's CommonJS contract. Review on any Expo Router update or by the deadline. |
 | Coverage thresholds         | Thresholds may differ by repository.                                                    | Commands, source inclusion, reporters, and honest measurement are shared; a strong suite is not weakened to match a weaker one. |
 
 Exceptions are not defects. Any unlisted failure to meet a required contract is
@@ -318,6 +334,7 @@ separate roadmap is needed.
 | Status | Priority | Scope                          | Outcome required                                                                                                                                                                     | Evidence required                                                                                                                                                                                                                              |
 | ------ | -------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Now    | P1       | Production operations          | Extend the observability contract into a deployment-owned, open-source-first production profile with measurable reliability, bounded resource usage, and no mandatory hosted vendor. | Container runtimes export durable metrics, logs, and traces; static distributions expose availability, delivery, and access signals; each profile has an availability/latency SLO, Alertmanager-compatible routing, access controls, retention and sampling limits, cardinality/resource budgets, cost assumptions, and an operator runbook exercised by a failure drill. |
+| Blocked | P1       | Expo security blocker          | Keep Expo's `Security` check failing until the unpatched `node-forge@1.4.0` RSA signature verification finding is fixed; no accepted-risk exception is authorized. | A patched release or reviewed upstream fix is installed, tooling compatibility and web export pass, and the unmodified high/critical dependency gate passes. |
 | Next   | P1       | AWS application distribution   | Turn `terraform-template-baseline` into the AWS reference for every Active application through explicit container-service and static-web profiles; preserve framework-native artifacts, keep native Expo releases separate, and introduce no cross-cloud or paid-only abstraction. | Formatting, validation, linting, security scanning, mocked tests, and deterministic plans pass without credentials for every consumer fixture; an owner-authorized disposable AWS matrix that fits the account's current no-cost allowance proves each app's routing, TLS boundary, secrets, PostgreSQL/Redis wiring where required, migrations, health, rollback, and teardown before live distribution is claimed. |
 | Next   | P2       | Kubernetes delivery            | Activate `helm-template-baseline` as a separate delivery layer for every container-service consumer, reusing immutable application images and keeping cluster provisioning, static sites, and Expo native releases out of the chart contract. | Chart linting, schema validation, render tests for every consumer, and a disposable local cluster smoke prove probes, configuration and secret wiring, resources, autoscaling, disruption handling, ingress/TLS, migration execution, observability attachment, rollback, and teardown without requiring a paid cluster. |
 | Next   | P1       | Microservices resumption       | Resume only the existing NestJS and FastAPI services as a bounded reliability slice; do not add framework variants or business-demo breadth.                                         | Governance pause is explicitly lifted for the slice; deployed NATS interoperability proves transactional publication, idempotent consumption, versioned events, retry, dead-letter and replay behavior, trace propagation, SLOs, and rollback. |
