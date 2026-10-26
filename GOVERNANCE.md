@@ -311,6 +311,9 @@ active work or requires a governance decision before it is accepted.
   updates on a predictable schedule, and separately reviewed majors.
 - Major updates require dashboard approval and must not be hidden inside a
   general dependency group.
+- Python interpreter minor upgrades are runtime migrations requiring dashboard
+  approval. Update CI, publishing, version constraints, and container runtimes
+  together only after dependency support and matching validation are available.
 - Shared-config updates are reviewed before consumer updates proceed.
 - Renovate concurrency must be explicit and low enough that every open PR can
   be reviewed; inherited defaults are not portfolio policy.

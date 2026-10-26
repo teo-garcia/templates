@@ -63,6 +63,13 @@
       ]
     },
     {
+      "description": "Review Python interpreter minor upgrades as runtime migrations",
+      "matchPackageNames": ["python"],
+      "matchUpdateTypes": ["minor", "major"],
+      "groupName": "Python runtime",
+      "dependencyDashboardApproval": true
+    },
+    {
       "description": "Review shared configuration releases after their producer checks pass",
       "groupName": "teo-garcia shared configs",
       "matchPackageNames": [
