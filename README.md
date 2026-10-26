@@ -77,8 +77,9 @@ not vary by framework:
 - `reusable-container-release.yml` publishes semver-tagged images to GHCR with
   an SBOM and provenance only after the caller's verification job succeeds.
 
-Calling repositories keep their event and path filters, ecosystem dependency
-audit, and framework-specific smoke script. They must pin portfolio workflows
+Calling repositories own their triggers, ecosystem dependency audit, and
+framework-specific smoke script. Security checks run on every pull request and
+main-branch push without path filters. They must pin portfolio workflows
 to a full commit SHA. Updating or rolling back the policy is an explicit change
 to that SHA; moving branch and tag references are not accepted.
 
