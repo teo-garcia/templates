@@ -59,7 +59,67 @@ export const assertSecurityWorkflow = (source) => {
     "security workflow must enforce severity filtering for both SARIF scans",
   );
   assert.match(source, /fail-on-severity:\s+high/);
+  const findingPolicy = source.match(
+    /^      fail-on-findings:\n((?: {8}.*\n)+)/m,
+  )?.[1];
+  assert.ok(
+    findingPolicy,
+    "security workflow must declare its findings policy",
+  );
+  assert.match(findingPolicy, /^        default: true$/m);
   assert.doesNotMatch(source, /(packages|attestations|id-token):\s+write/);
+};
+
+export const assertSecurityConsumer = (source, name, auditJob) => {
+  assert.match(
+    source,
+    /^  push:\n    branches: \[main\]/m,
+    `${name} must scan main`,
+  );
+  assert.match(
+    source,
+    /^  pull_request:\n    branches: \[main\]/m,
+    `${name} must scan every PR`,
+  );
+  assert.doesNotMatch(
+    source,
+    /^    paths(?:-ignore)?:/m,
+    `${name} required checks cannot use path filters`,
+  );
+  assert.match(
+    source,
+    /fail-on-findings: true/,
+    `${name} must enforce shared findings`,
+  );
+  assert.doesNotMatch(
+    source,
+    /continue-on-error: true/,
+    `${name} cannot ignore failed scans`,
+  );
+
+  const gate = source.match(
+    /^  security:\n([\s\S]*?)(?=^  \S|$(?![\s\S]))/m,
+  )?.[1];
+  assert.ok(gate, `${name} must expose a stable security gate`);
+  assert.match(gate, /name: Security\n/);
+  assert.match(
+    gate,
+    /if: always\(\)/,
+    `${name} must report failures and cancellations`,
+  );
+  assert.match(gate, /needs: \[shared-security(?:, [\w-]+)?\]/);
+  assert.match(
+    gate,
+    /SHARED_SECURITY_RESULT: \$\{\{ needs\.shared-security\.result \}\}/,
+  );
+  assert.match(gate, /test "\$SHARED_SECURITY_RESULT" = success/);
+  if (auditJob) {
+    assert.match(gate, new RegExp(`needs: \\[shared-security, ${auditJob}\\]`));
+    assert.ok(
+      gate.includes("AUDIT_RESULT: ${{ needs." + auditJob + ".result }}"),
+    );
+    assert.match(gate, /test "\$AUDIT_RESULT" = success/);
+  }
 };
 
 export const assertReleaseWorkflow = (source) => {
@@ -286,6 +346,17 @@ for (const consumer of consumers) {
     securitySource: pilotSecuritySource,
     releaseSource: pilotReleaseSource,
   });
+  const auditJob =
+    consumer.directory === "gin-template-monolith"
+      ? "govulncheck"
+      : ["fastapi-template-monolith", "django-template-monolith"].includes(
+            consumer.directory,
+          )
+        ? "pip-audit"
+        : consumer.directory === "spring-template-monolith"
+          ? undefined
+          : "npm-audit";
+  assertSecurityConsumer(pilotSecuritySource, consumer.name, auditJob);
 }
 
 console.log(
