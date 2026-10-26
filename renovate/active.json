@@ -1,11 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Dependency policy for active teo-garcia template repositories",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended"
+  ],
   "dependencyDashboard": true,
-  "labels": ["dependencies"],
+  "labels": [
+    "dependencies"
+  ],
   "timezone": "America/Bogota",
-  "schedule": ["* 0-5 * * 1"],
+  "schedule": [
+    "* 0-5 * * 1"
+  ],
   "minimumReleaseAge": "3 days",
   "prConcurrentLimit": 3,
   "branchConcurrentLimit": 3,
@@ -16,7 +22,9 @@
   },
   "vulnerabilityAlerts": {
     "enabled": true,
-    "addLabels": ["security"],
+    "addLabels": [
+      "security"
+    ],
     "automerge": false,
     "groupName": null
   },
@@ -25,7 +33,9 @@
     {
       "customType": "regex",
       "description": "Track the pinned golangci-lint declared in Makefiles",
-      "managerFilePatterns": ["/(^|/)Makefile$/"],
+      "managerFilePatterns": [
+        "/(^|/)Makefile$/"
+      ],
       "matchStrings": [
         "GOLANGCI_LINT_VERSION\\s*\\?=\\s*(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
       ],
@@ -35,7 +45,9 @@
     {
       "customType": "regex",
       "description": "Track the pinned govulncheck declared in Makefiles",
-      "managerFilePatterns": ["/(^|/)Makefile$/"],
+      "managerFilePatterns": [
+        "/(^|/)Makefile$/"
+      ],
       "matchStrings": [
         "GOVULNCHECK_VERSION\\s*\\?=\\s*(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
       ],
@@ -45,7 +57,9 @@
     {
       "customType": "regex",
       "description": "Track dependencies annotated in GitHub workflow environment variables",
-      "managerFilePatterns": ["/^\\.github/workflows/[^/]+\\.ya?ml$/"],
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.ya?ml$/"
+      ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+(?:[A-Z0-9_]+_VERSION): [\\\"](?<currentValue>[^\\\"]+)[\\\"]"
       ]
@@ -55,12 +69,27 @@
     {
       "description": "Group routine non-major updates while keeping shared configuration releases separate",
       "groupName": "routine dependencies",
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "matchPackageNames": [
         "!@teo-garcia/**",
         "!/^teo-(ruff|mypy|pytest)-config-shared$/",
         "!github.com/teo-garcia/**"
       ]
+    },
+    {
+      "description": "Review Python interpreter minor upgrades as runtime migrations",
+      "matchPackageNames": [
+        "python"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
+      "groupName": "Python runtime",
+      "dependencyDashboardApproval": true
     },
     {
       "description": "Review shared configuration releases after their producer checks pass",
@@ -71,7 +100,9 @@
         "github.com/teo-garcia/**"
       ],
       "dependencyDashboardApproval": true,
-      "reviewers": ["teo-garcia"]
+      "reviewers": [
+        "teo-garcia"
+      ]
     }
   ]
 }
