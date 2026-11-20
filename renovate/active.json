@@ -17,8 +17,8 @@
   "vulnerabilityAlerts": {
     "enabled": true,
     "addLabels": ["security"],
-    "automerge": false,
-    "groupName": null
+    "automerge": true,
+    "groupName": "security fixes"
   },
   "osvVulnerabilityAlerts": true,
   "postUpdateOptions": ["gomodTidy"],
@@ -64,10 +64,48 @@
       ]
     },
     {
+      "description": "Merge patch updates automatically once every required check passes; a group merges only when all of its updates are patches",
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "description": "Review container base image minor upgrades as runtime migrations",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["minor"],
+      "groupName": "container runtime images",
+      "dependencyDashboardApproval": true
+    },
+    {
       "description": "Review Python interpreter minor upgrades as runtime migrations",
       "matchPackageNames": ["python"],
       "matchUpdateTypes": ["minor", "major"],
       "groupName": "Python runtime",
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Propose Go toolchain updates in applications; shared Go tooling keeps its declared consumer minimum",
+      "matchManagers": ["gomod"],
+      "matchDepTypes": ["golang", "toolchain"],
+      "matchRepositories": ["!/-config-shared$/"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "Offer Go toolchain patches separately so a pending minor upgrade never holds back a security patch",
+      "matchPackageNames": ["go", "golang"],
+      "separateMinorPatch": true
+    },
+    {
+      "description": "Keep the go directive and Go images aligned and merge toolchain patches automatically",
+      "matchPackageNames": ["go", "golang"],
+      "matchUpdateTypes": ["patch"],
+      "groupName": "Go runtime patch",
+      "automerge": true
+    },
+    {
+      "description": "Review Go minor upgrades as runtime migrations",
+      "matchPackageNames": ["go", "golang"],
+      "matchUpdateTypes": ["minor", "major"],
+      "groupName": "Go runtime",
       "dependencyDashboardApproval": true
     },
     {
