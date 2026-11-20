@@ -309,11 +309,20 @@ active work or requires a governance decision before it is accepted.
 
 - Active repositories receive immediate security updates, grouped patch/minor
   updates on a predictable schedule, and separately reviewed majors.
+- A repository's security updates are grouped into one pull request, so one
+  unfixed advisory cannot keep another fix's `Security` check red. Security
+  groups and patch-only groups merge automatically once every required check
+  passes; groups containing a minor update wait for review.
+- Dashboard approval gates whether an update is proposed. An approved update
+  still merges only through the same required checks.
 - Major updates require dashboard approval and must not be hidden inside a
   general dependency group.
-- Python interpreter minor upgrades are runtime migrations requiring dashboard
-  approval. Update CI, publishing, version constraints, and container runtimes
-  together only after dependency support and matching validation are available.
+- Python interpreter minors, Go toolchain minors, and container base image
+  minors are runtime migrations requiring dashboard approval. Update CI,
+  publishing, version constraints, and container runtimes together only after
+  dependency support and matching validation are available.
+- Application Go toolchain patches keep the `go` directive and Go images in one
+  aligned update. Shared Go tooling keeps its declared consumer minimum.
 - Shared-config updates are reviewed before consumer updates proceed.
 - Renovate concurrency must be explicit and low enough that every open PR can
   be reviewed; inherited defaults are not portfolio policy.
