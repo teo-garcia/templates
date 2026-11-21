@@ -70,19 +70,16 @@ const consumerWorkflow = readFileSync(
 )
 const sharedLintVersion = sharedLintMakefile.match(lintVersionPattern)?.[1]
 const consumerLintVersion = consumerMakefile.match(lintVersionPattern)?.[1]
-const workflowLintVersion = consumerWorkflow.match(
-  /^\s+GOLANGCI_LINT_VERSION: (v\d+\.\d+\.\d+)$/m
-)?.[1]
 assert.ok(sharedLintVersion, 'golangci-config-shared must pin golangci-lint')
 assert.equal(
   consumerLintVersion,
   sharedLintVersion,
   'gin-template-monolith must use the golangci-config-shared linter version'
 )
-assert.equal(
-  workflowLintVersion,
-  sharedLintVersion,
-  'gin-template-monolith CI must use the golangci-config-shared linter version'
+assert.doesNotMatch(
+  consumerWorkflow,
+  /^\s*GOLANGCI_LINT_VERSION:/m,
+  'gin-template-monolith CI must read the linter version from its Makefile instead of overriding it'
 )
 
 const tempRoot = mkdtempSync(path.join(tmpdir(), 'templates-go-consumer-'))
