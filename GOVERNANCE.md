@@ -311,9 +311,12 @@ active work or requires a governance decision before it is accepted.
 - Active repositories receive immediate security updates, grouped patch/minor
   updates on a predictable schedule, and separately reviewed majors.
 - A repository's security updates are grouped into one pull request, so one
-  unfixed advisory cannot keep another fix's `Security` check red. Security
-  groups and patch-only groups merge automatically once every required check
-  passes; groups containing a minor update wait for review.
+  unfixed advisory cannot keep another fix's `Security` check red. Groups whose
+  updates are all patches, security fixes included, merge automatically once
+  every required check passes. Security fixes that change a minor or major
+  version open immediately but wait for review: an advisory can be matched to
+  the wrong copy of a package, and a forced major breaks callers CI may not
+  exercise.
 - Dashboard approval gates whether an update is proposed. An approved update
   still merges only through the same required checks.
 - Major updates require dashboard approval and must not be hidden inside a
