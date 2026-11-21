@@ -131,9 +131,10 @@ Accepted risks name the affected dependency and advisory, explain the reviewed
 exposure, and have an explicit expiry. The portfolio checks these deadlines
 daily even when there are no code changes.
 
-Gin's application runtime uses Go 1.26.11 or newer to include the standard
-library security fixes required by its vulnerability scan. Shared Go tooling
-retains its existing minimum consumer version.
+Gin's application runtime uses Go 1.27.4 or newer. Shared Go tooling requires
+Go 1.26.11 or newer: it stays on the oldest upstream-supported Go release so
+consumers keep the widest supported range, and golangci-lint 2.13+ cannot be
+built with Go 1.25, which left upstream support on 2026-08-19.
 
 ## Observable contracts
 
