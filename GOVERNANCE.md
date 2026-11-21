@@ -324,7 +324,9 @@ active work or requires a governance decision before it is accepted.
   dependency support and matching validation are available.
 - Application Go toolchain patches keep the `go` directive and Go images in one
   aligned update. Shared Go tooling keeps its declared consumer minimum.
-- Shared-config updates are reviewed before consumer updates proceed.
+- Shared-config releases are reviewed before tagging: the superproject pins the
+  release commit and its real-consumer jobs must pass. Consumer updates then
+  follow the normal patch and minor flow without a second approval.
 - Renovate concurrency must be explicit and low enough that every open PR can
   be reviewed; inherited defaults are not portfolio policy.
 - Paused repositories receive critical security updates only.
