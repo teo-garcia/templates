@@ -17,7 +17,6 @@
   "vulnerabilityAlerts": {
     "enabled": true,
     "addLabels": ["security"],
-    "automerge": true,
     "groupName": "security fixes"
   },
   "osvVulnerabilityAlerts": true,
