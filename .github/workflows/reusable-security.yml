@@ -7,7 +7,7 @@ on:
         description: Fail when Trivy finds a fixed high or critical issue
         required: false
         type: boolean
-        default: false
+        default: true
       ignore-unfixed:
         description: Ignore findings without an available fix
         required: false
