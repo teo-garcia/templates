@@ -109,14 +109,13 @@
       "dependencyDashboardApproval": true
     },
     {
-      "description": "Review shared configuration releases after their producer checks pass",
+      "description": "Keep shared configuration releases in their own group; each release is verified in real consumers before it is tagged",
       "groupName": "teo-garcia shared configs",
       "matchPackageNames": [
         "@teo-garcia/**",
         "/^teo-(ruff|mypy|pytest)-config-shared$/",
         "github.com/teo-garcia/**"
       ],
-      "dependencyDashboardApproval": true,
       "reviewers": ["teo-garcia"]
     }
   ]

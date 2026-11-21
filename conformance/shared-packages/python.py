@@ -95,7 +95,7 @@ with tempfile.TemporaryDirectory(prefix="templates-python-consumer-") as tempora
     if pytest_config["pytest"]["testpaths"] not in consumer_pytest["testpaths"]:
         raise RuntimeError("FastAPI test path drifted from the shared baseline")
     shared_strict_markers = pytest_config["pytest"].getboolean("strict_markers")
-    consumer_strict_markers = "--strict-markers" in consumer_pytest["addopts"]
+    consumer_strict_markers = consumer_pytest.get("strict_markers") is True
     if shared_strict_markers and not consumer_strict_markers:
         raise RuntimeError("FastAPI strict markers drifted from the shared baseline")
 
