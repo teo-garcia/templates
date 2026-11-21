@@ -54,7 +54,7 @@ applications.
 | `vitest-config-shared`   | Node 24+, Vitest 4, and Vite/React peers declared by the package | `next-template-fullstack`   |
 | `ruff-config-shared`     | Python 3.12+ and Ruff 0.8+                                       | `fastapi-template-monolith` |
 | `mypy-config-shared`     | Python 3.12+ and mypy 1.14+                                      | `fastapi-template-monolith` |
-| `pytest-config-shared`   | Python 3.12+, pytest 8.3+, and pytest-cov 6+                     | `fastapi-template-monolith` |
+| `pytest-config-shared`   | Python 3.12+, pytest 9.0+, and pytest-cov 6+                     | `fastapi-template-monolith` |
 | `golangci-config-shared` | Go 1.25.13+ and golangci-lint 2.12+                              | `gin-template-monolith`     |
 | `gotest-config-shared`   | Go 1.25.13+                                                      | `gin-template-monolith`     |
 
