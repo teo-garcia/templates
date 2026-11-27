@@ -75,6 +75,18 @@
       "dependencyDashboardApproval": true
     },
     {
+      "description": "Treat the uv image as build tooling that follows the routine flow, not a runtime base image",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/astral-sh/uv"],
+      "groupName": "routine dependencies",
+      "dependencyDashboardApproval": false
+    },
+    {
+      "description": "Keep Python lockfiles current within declared ranges; update type still decides review",
+      "matchManagers": ["pep621"],
+      "rangeStrategy": "update-lockfile"
+    },
+    {
       "description": "Review Python interpreter minor upgrades as runtime migrations",
       "matchPackageNames": ["python"],
       "matchUpdateTypes": ["minor", "major"],
@@ -117,5 +129,9 @@
       ],
       "reviewers": ["teo-garcia"]
     }
-  ]
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["* 0-5 * * 1"]
+  }
 }
